@@ -1,6 +1,5 @@
 #ifndef DATASTRUCT_H
 #define DATASTRUCT_H
-
 #include <iostream>
 #include <complex>
 #include <utility>
@@ -12,7 +11,6 @@ struct DataStruct {
     std::pair<long long, unsigned long long> key2;
     std::string key3;
 
-    // Перегрузка оператора >> для чтения данных в структуру
     friend std::istream& operator>>(std::istream& is, DataStruct& ds) {
         std::string line;
         if (std::getline(is, line)) {
@@ -33,8 +31,6 @@ struct DataStruct {
         }
         return is;
     }
-
-    // Перегрузка оператора << для вывода данных структуры
     friend std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
         os << "(" << ds.key1.real() << ", " << ds.key1.imag() << ", " << ds.key2.first << ", " << ds.key2.second << ", \"" << ds.key3 << "\")";
         return os;
