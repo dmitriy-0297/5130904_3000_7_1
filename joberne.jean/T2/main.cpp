@@ -1,31 +1,23 @@
-#include "DataStruct.h"
-#include <vector>
-#include <algorithm>
-#include <iterator>
+#include "namespace.h"
+using namespace jean;
 
 int main() {
-    std::vector<DataStruct> data;
+    try {
+        std::vector<DataStruct> data;
+        DataStruct tmp;
+        while (std::cin >> tmp) {
+            data.push_back(tmp);
+        }
 
-    // Чтение данных в вектор
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(data)
-    );
+        std::sort(data.begin(), data.end(), compareDataStruct);
 
-    // Сортировка данных
-    std::sort(data.begin(), data.end(), [](const DataStruct& a, const DataStruct& b) {
-        if (a.key1.real() != b.key1.real()) return a.key1.real() < b.key1.real();
-        if (a.key2.first != b.key2.first) return a.key2.first < b.key2.first;
-        return a.key3.length() < b.key3.length();
-    });
-
-    // Вывод данных
-    std::copy(
-        data.begin(),
-        data.end(),
-        std::ostream_iterator<DataStruct>(std::cout, "\n")
-    );
-
-    return 0;
+        for (const auto& item : data) {
+            std::cout << item << "\n";
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
+
