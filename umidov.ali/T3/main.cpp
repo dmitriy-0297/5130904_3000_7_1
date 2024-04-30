@@ -116,3 +116,4 @@
         handleCommands(polygons);
         return 0;
     }
+
