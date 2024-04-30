@@ -20,16 +20,16 @@
     {
         std::vector<Point> points;
 
-        double area() const 
+        double area() const
         {
             double total = 0.0;
-            for (size_t i = 0, j = points.size() - 1; i < points.size(); j = i++) 
+            for (size_t i = 0, j = points.size() - 1; i < points.size(); j = i++)
             {
                 total += (points[j].x + points[i].x) * (points[j].y - points[i].y);
             }
             return std::abs(total) / 2.0;
         }
-        size_t vertexCount() const 
+        size_t vertexCount() const
         {
             return points.size();
         }
@@ -38,7 +38,7 @@
     {
         return sscanf(str.c_str(), " (%d;%d)", &p.x, &p.y) == 2;
     }
-    bool load_polygons(const char* filename, std::vector<Polygon>& polygons) 
+    bool load_polygons(const char* filename, std::vector<Polygon>& polygons)
     {
         std::ifstream file(filename);
         if (!file) 
@@ -47,17 +47,17 @@
             return false;
         }
         std::string line;
-        while (std::getline(file, line)) 
+        while (std::getline(file, line))
         {
             std::istringstream iss(line);
             int vertices_count;
             if (!(iss >> vertices_count)) continue;
             Polygon poly;
             std::string point_str;
-            while (vertices_count-- > 0 && iss >> point_str) 
+            while (vertices_count-- > 0 && iss >> point_str)
             {
                 Point p;
-                if (parse_point(point_str, p)) 
+                if (parse_point(point_str, p))
                 {
                     poly.points.push_back(p);
                 }
@@ -69,10 +69,10 @@
         }
         return true;
     }
-    void handleCommands(const std::vector<Polygon>& polygons) 
+    void handleCommands(const std::vector<Polygon>& polygons)
     {
         std::string command;
-        while (std::cout << "> " && std::cin >> command) 
+        while (std::cout << "> " && std::cin >> command)
         {
             if (command == "AREA") 
             {
