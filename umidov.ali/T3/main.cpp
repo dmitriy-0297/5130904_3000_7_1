@@ -10,9 +10,7 @@
         #include <sstream>
         #include <iterator>
         #include <exception>
-
         const std::string I_C = "<INVALID COMMAND>";
-
         namespace tretyak
         {
             struct Point
@@ -20,18 +18,16 @@
                 int x;
                 int y;
                 Point(int x = 0, int y = 0) : x(x), y(y) {}
-
                 bool operator!=(const Point& other) const
                 {
                     return x != other.x || y != other.y;
                 }
             };
-
             struct Polygon
             {
                 std::vector<Point> points;
-
-                double area() const {
+                double area() const
+                {
                     double accum = 0.0;
                     for (size_t i = 0; i < points.size(); i++)
                     {
@@ -41,7 +37,6 @@
                     }
                     return std::abs(accum * 0.5);
                 }
-
                 bool operator==(const Polygon& other) const
                 {
                     if (points.size() != other.points.size())
@@ -54,19 +49,16 @@
                     return true;
                 }
             };
-
             std::istream& operator>>(std::istream& in, Point& elem)
             {
                 in >> elem.x >> elem.y;
                 return in;
             }
-
             std::ostream& operator<<(std::ostream& out, const Point& elem)
             {
                 out << "(" << elem.x << ";" << elem.y << ")";
                 return out;
             }
-
             std::istream& operator>>(std::istream& in, Polygon& elem)
             {
                 int tSize;
@@ -78,7 +70,6 @@
                 }
                 return in;
             }
-
             std::ostream& operator<<(std::ostream& out, const Polygon& elem)
             {
                 out << elem.points.size() << " ";
@@ -89,7 +80,6 @@
                 return out;
             }
         }
-
         namespace cmd
         {
             int validStringToInt(const std::string& str)
@@ -102,7 +92,6 @@
                 }
                 return sInt;
             }
-
             void area(std::vector<tretyak::Polygon>& polygons, const std::string& str)
             {
                 int data = validStringToInt(str);
@@ -146,7 +135,6 @@
                     throw std::runtime_error(I_C);
                 }
             }
-
             void max(std::vector<tretyak::Polygon>& polygons, const std::string& str)
             {
                 if (polygons.empty())
@@ -176,7 +164,6 @@
                     throw std::runtime_error(I_C);
                 }
             }
-
             void min(std::vector<tretyak::Polygon>& polygons, const std::string& str)
             {
                 if (polygons.empty())
@@ -207,7 +194,6 @@
                 }
             }
         }
-
         int main(int argc, char* argv[])
         {
             if (argc != 2)
@@ -215,7 +201,6 @@
                 std::cerr << "Usage: program_name <filename>\n";
                 return EXIT_FAILURE;
             }
-
             std::string fileName = argv[1];
             std::ifstream file(fileName);
             if (!file)
@@ -223,14 +208,12 @@
                 std::cerr << "Error: file didn't open\n";
                 return EXIT_FAILURE;
             }
-
             std::vector<tretyak::Polygon> polygons;
             tretyak::Polygon poly;
             while (file >> poly)
             {
                 polygons.push_back(poly);
             }
-
             try
             {
                 std::string str, cmd1, cmd2;
