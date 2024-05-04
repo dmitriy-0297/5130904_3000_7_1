@@ -13,7 +13,6 @@
             int x;
             int y;
         };
-
         struct Polygon
         {
             std::vector<Point> points;
