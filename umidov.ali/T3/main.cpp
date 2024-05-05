@@ -16,44 +16,51 @@
 
             struct Point {
                 int x, y;
-                friend std::istream& operator>>(std::istream& is, Point& p) {
-                    char ch1, ch2, ch3;
-                    if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
-                        is.setstate(std::ios::failbit);
-                    }
-                    return is;
-                }
+                friend std::istream& operator>>(std::istream& is, Point& p);
             };
 
             struct Polygon {
                 std::vector<Point> points;
-
-                double area() const {
-                    double totalArea = 0.0;
-                    for (size_t i = 0; i < points.size(); i++) {
-                        int j = (i + 1) % points.size();
-                        totalArea += points[i].x * points[j].y;
-                        totalArea -= points[j].x * points[i].y;
-                    }
-                    return std::fabs(totalArea / 2.0);
-                }
-
-                friend std::istream& operator>>(std::istream& is, Polygon& poly) {
-                    int count;
-                    if (!(is >> count) || count < 3) {
-                        is.setstate(std::ios::failbit);
-                        return is;
-                    }
-                    poly.points.resize(count);
-                    for (Point& p : poly.points) {
-                        if (!(is >> p)) {
-                            break;
-                        }
-                    }
-                    return is;
-                }
+                double area() const;
+                friend std::istream& operator>>(std::istream& is, Polygon& poly);
             };
 
+            std::istream& operator>>(std::istream& is, Point& p) {
+                char ch1, ch2, ch3;
+                if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
+                    is.setstate(std::ios::failbit);
+                }
+                return is;
+            }
+
+            std::istream& operator>>(std::istream& is, Polygon& poly) {
+                int count;
+                is >> count;
+                if (!is || count < 3) {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
+                poly.points.clear();
+                for (int i = 0; i < count; i++) {
+                    Point p;
+                    if (!(is >> p)) {
+                        is.setstate(std::ios::failbit);
+                        break;
+                    }
+                    poly.points.push_back(p);
+                }
+                return is;
+            }
+
+            double Polygon::area() const {
+                double totalArea = 0.0;
+                for (size_t i = 0; i < points.size(); i++) {
+                    int j = (i + 1) % points.size();
+                    totalArea += points[i].x * points[j].y;
+                    totalArea -= points[j].x * points[i].y;
+                }
+                return std::fabs(totalArea / 2.0);
+            }
         }
 
         using namespace tretyak;
@@ -100,65 +107,62 @@
                 else if (command == "COUNT") {
                     handleCountCommand(type);
                 }
+                else if (command == "MAX") {
+                    handleMaxCommand(type);
+                }
                 else {
                     throw std::runtime_error("<INVALID COMMAND>");
                 }
             }
 
             void handleAreaCommand(const std::string& type) {
-                double result = 0.0;
                 if (type == "MEAN") {
                     if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
-                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
+                    double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
                         return acc + p.area();
                         }) / polygons.size();
-                }
-                else if (type == "EVEN" || type == "ODD") {
-                    int parity = (type == "EVEN") ? 0 : 1;
-                    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [parity](double acc, const Polygon& p) {
-                            if (static_cast<int>(p.points.size()) % 2 == parity) {
-                                return acc + p.area();
-                            }
-                            return acc;
-                        });
-                    if (totalArea == 0 && !polygons.empty()) {
-                        throw std::runtime_error("<INVALID COMMAND>"); // No polygons of the specified type
-                    }
-                    result = totalArea;
+                        std::cout << std::fixed << std::setprecision(1) << result << std::endl;
                 }
                 else {
                     throw std::runtime_error("<INVALID COMMAND>");
                 }
-                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
             }
-
 
             void handleCountCommand(const std::string& type) {
-                int count = 0;
                 if (type == "EVEN" || type == "ODD") {
                     int parity = (type == "EVEN") ? 0 : 1;
-                    count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-                        return (static_cast<int>(p.points.size()) % 2 == parity);
+                    int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+                        return static_cast<int>(p.points.size()) % 2 == parity;
                         });
+                    std::cout << count << std::endl;
                 }
                 else {
-                    int vertexCount;
-                    try {
-                        vertexCount = std::stoi(type);
-                        if (vertexCount < 3) {
-                            throw std::runtime_error("<INVALID COMMAND>");
-                        }
-                        count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                            return static_cast<int>(p.points.size()) == vertexCount;
-                            });
-                    }
-                    catch (std::invalid_argument&) {
-                        throw std::runtime_error("<INVALID COMMAND>");
-                    }
+                    throw std::runtime_error("<INVALID COMMAND>");
                 }
-                std::cout << count << std::endl;
             }
+
+            void handleMaxCommand(const std::string& type) {
+                if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
+
+                if (type == "AREA") {
+                    auto maxAreaPolygon = *std::max_element(polygons.begin(), polygons.end(),
+                        [](const Polygon& a, const Polygon& b) {
+                            return a.area() < b.area();
+                        });
+                    std::cout << std::fixed << std::setprecision(1) << maxAreaPolygon.area() << std::endl;
+                }
+                else if (type == "VERTEXES") {
+                    auto maxVerticesPolygon = *std::max_element(polygons.begin(), polygons.end(),
+                        [](const Polygon& a, const Polygon& b) {
+                            return a.points.size() < b.points.size();
+                        });
+                    std::cout << maxVerticesPolygon.points.size() << std::endl;
+                }
+                else {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+            }
+
         };
 
         int main(int argc, char** argv) {
