@@ -87,22 +87,17 @@
 
             void processLine(const std::string& line) {
                 std::istringstream iss(line);
-                std::string command;
-                if (!(iss >> command)) {
+                std::string command, type;
+                iss >> command >> type;
+                if (command.empty() || type.empty()) {
                     throw std::runtime_error("<INVALID COMMAND>");
                 }
 
-                if (command == "AREA" || command == "COUNT") {
-                    std::string type;
-                    if (!(iss >> type)) {
-                        throw std::runtime_error("<INVALID COMMAND>");
-                    }
-                    if (command == "AREA") {
-                        handleAreaCommand(type);
-                    }
-                    else if (command == "COUNT") {
-                        handleCountCommand(type);
-                    }
+                if (command == "AREA") {
+                    handleAreaCommand(type);
+                }
+                else if (command == "COUNT") {
+                    handleCountCommand(type);
                 }
                 else {
                     throw std::runtime_error("<INVALID COMMAND>");
@@ -124,13 +119,23 @@
             }
 
             void handleCountCommand(const std::string& type) {
-                if (type != "EVEN" && type != "ODD") {
-                    throw std::runtime_error("<INVALID COMMAND>");
+                if (type == "EVEN" || type == "ODD") {
+                    int parity = (type == "EVEN") ? 0 : 1;
+                    int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+                        return (p.points.size() % 2 == parity);
+                        });
+                    std::cout << count << std::endl;
                 }
-                int count = std::count_if(polygons.begin(), polygons.end(), [type](const Polygon& p) {
-                    return (type == "EVEN") ? (p.points.size() % 2 == 0) : (p.points.size() % 2 != 0);
-                    });
-                std::cout << count << std::endl;
+                else {
+                    int vertexCount = std::stoi(type);
+                    if (vertexCount < 3) {
+                        throw std::runtime_error("<INVALID COMMAND>");
+                    }
+                    int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
+                        return p.points.size() == vertexCount;
+                        });
+                    std::cout << count << std::endl;
+                }
             }
         };
 
