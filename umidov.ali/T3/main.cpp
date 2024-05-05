@@ -95,17 +95,17 @@
 
             void handleCountCommand(const std::string& type) {
                 if (type == "EVEN" || type == "ODD") {
-                    auto parity = static_cast<std::vector<Point>::size_type>((type == "EVEN") ? 0 : 1);
+                    int parity = (type == "EVEN") ? 0 : 1;
                     int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-                        return (p.points.size() % 2 == parity);
+                        return (static_cast<int>(p.points.size()) % 2 == parity);
                         });
                     std::cout << count << std::endl;
                 }
                 else {
                     try {
-                        auto vertexCount = static_cast<std::vector<Point>::size_type>(std::stoi(type));
+                        int vertexCount = std::stoi(type);
                         int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                            return (p.points.size() == vertexCount);
+                            return (static_cast<int>(p.points.size()) == vertexCount);
                             });
                         std::cout << count << std::endl;
                     }
@@ -114,6 +114,7 @@
                     }
                 }
             }
+
 
 
             void handleAreaCommand(const std::string& type) {
