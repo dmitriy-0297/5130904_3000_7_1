@@ -86,7 +86,6 @@
             }
             std::cout << count << std::endl;
         }
-
         void processCommands(std::vector<Polygon>& polygons) {
             std::string commandLine;
             while (getline(std::cin, commandLine)) {
@@ -117,7 +116,7 @@
                         int numVertices = std::stoi(param);
                         double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                             [numVertices](double acc, const Polygon& poly) {
-                                if (poly.points.size() == numVertices) {
+                                if (poly.points.size() == static_cast<size_t>(numVertices)) {
                                     return acc + polygonArea(poly);
                                 }
                                 return acc;
