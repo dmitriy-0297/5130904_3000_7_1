@@ -7,123 +7,141 @@
         #include <cmath>
         #include <sstream>
         #include <limits>
-        #include <map>
-        #include <numeric>
         #include <iomanip>
+        #include <stdexcept>
+        #include <numeric>
 
-        struct Point {
-            int x = 0;
-            int y = 0;
-        };
+        namespace tretyak {
 
-        struct Polygon {
-            std::vector<Point> points;
-
-            bool operator==(const Polygon& other) const {
-                if (points.size() != other.points.size()) return false;
-                for (size_t i = 0; i < points.size(); ++i) {
-                    if (points[i].x != other.points[i].x || points[i].y != other.points[i].y) return false;
+            struct Point {
+                int x, y;
+                friend std::istream& operator>>(std::istream& is, Point& p) {
+                    char ch1, ch2, ch3;
+                    if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
+                        is.setstate(std::ios::failbit);
+                    }
+                    return is;
                 }
-                return true;
-            }
-        };
+            };
 
-        std::istream& operator>>(std::istream& is, Point& p) {
-            char ignore;
-            if (!(is >> ignore >> p.x >> ignore >> p.y >> ignore)) {
-                is.setstate(std::ios::failbit);
-            }
-            return is;
-        }
+            struct Polygon {
+                std::vector<Point> points;
 
-        std::istream& operator>>(std::istream& is, Polygon& poly) {
-            int numVertices;
-            char ch;
-            if (!(is >> numVertices) || numVertices < 3) {
-                is.setstate(std::ios::failbit);
-                return is;
-            }
-            poly.points.clear();
-            poly.points.reserve(numVertices);
-            Point point;
-            for (int i = 0; i < numVertices; ++i) {
-                if (!(is >> ch >> point.x >> ch >> point.y >> ch)) {
-                    is.setstate(std::ios::failbit);
-                    break;
+                double area() const {
+                    double totalArea = 0.0;
+                    for (size_t i = 0; i < points.size(); i++) {
+                        int j = (i + 1) % points.size();
+                        totalArea += points[i].x * points[j].y;
+                        totalArea -= points[j].x * points[i].y;
+                    }
+                    return std::fabs(totalArea / 2.0);
                 }
-                poly.points.push_back(point);
-            }
-            return is;
+
+                friend std::istream& operator>>(std::istream& is, Polygon& poly) {
+                    int count;
+                    if (!(is >> count) || count < 3) {
+                        is.setstate(std::ios::failbit);
+                        return is;
+                    }
+                    poly.points.resize(count);
+                    for (Point& p : poly.points) {
+                        if (!(is >> p)) {
+                            break;
+                        }
+                    }
+                    return is;
+                }
+            };
+
         }
 
-        double polygonArea(const Polygon& poly) {
-            double area = 0.0;
-            int j = poly.points.size() - 1;
-            for (size_t i = 0; i < poly.points.size(); i++) {
-                area += (poly.points[j].x + poly.points[i].x) * (poly.points[j].y - poly.points[i].y);
-                j = i;
-            }
-            return std::abs(area / 2.0);
-        }
+        using namespace tretyak;
 
-        std::vector<Polygon> readPolygons(const std::string& filename) {
-            std::vector<Polygon> polygons;
-            std::ifstream file(filename);
-            if (!file) {
-                throw std::runtime_error("Unable to open file");
-            }
-            std::string line;
-            while (std::getline(file, line)) {
-                std::istringstream iss(line);
+        class CommandProcessor {
+        public:
+            explicit CommandProcessor(const std::string& filename) {
+                std::ifstream file(filename);
+                if (!file) {
+                    throw std::runtime_error("Unable to open file: " + filename);
+                }
                 Polygon poly;
-                if (iss >> poly) {
+                while (file >> poly) {
                     polygons.push_back(poly);
                 }
             }
-            return polygons;
-        }
 
-        void processCommands(std::vector<Polygon>& polygons) {
-            std::string commandLine;
-            while (getline(std::cin, commandLine)) {
-                std::istringstream iss(commandLine);
-                std::string command;
-                iss >> command;
-
-                if (command == "COUNT") {
-                    std::string type;
-                    iss >> type;
+            void processCommands() {
+                std::string line;
+                while (std::getline(std::cin, line)) {
                     try {
-                        int numVertices = std::stoi(type);
-                        if (numVertices < 3) {
-                            std::cout << "<INVALID COMMAND>" << std::endl;
-                        }
-                        else {
-                            int count = std::count_if(polygons.begin(), polygons.end(), [numVertices](const Polygon& poly) {
-                                return static_cast<int>(poly.points.size()) == numVertices;
-                                });
-                            std::cout << count << std::endl;
-                        }
+                        processLine(line);
                     }
-                    catch (const std::invalid_argument&) {
-                        std::cout << "<INVALID COMMAND>" << std::endl;
+                    catch (const std::exception& ex) {
+                        std::cout << ex.what() << std::endl;
+                    }
+                }
+            }
+
+        private:
+            std::vector<Polygon> polygons;
+
+            void processLine(const std::string& line) {
+                std::istringstream iss(line);
+                std::string command;
+                if (!(iss >> command)) {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+
+                if (command == "AREA" || command == "COUNT") {
+                    std::string type;
+                    if (!(iss >> type)) {
+                        throw std::runtime_error("<INVALID COMMAND>");
+                    }
+                    if (command == "AREA") {
+                        handleAreaCommand(type);
+                    }
+                    else if (command == "COUNT") {
+                        handleCountCommand(type);
                     }
                 }
                 else {
-                    std::cout << "INVALID COMMAND" << std::endl;
+                    throw std::runtime_error("<INVALID COMMAND>");
                 }
             }
-        }
+
+            void handleAreaCommand(const std::string& type) {
+                double result = 0.0;
+                if (type == "MEAN") {
+                    if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
+                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
+                        return acc + p.area();
+                        }) / polygons.size();
+                }
+                else {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+            }
+
+            void handleCountCommand(const std::string& type) {
+                if (type != "EVEN" && type != "ODD") {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+                int count = std::count_if(polygons.begin(), polygons.end(), [type](const Polygon& p) {
+                    return (type == "EVEN") ? (p.points.size() % 2 == 0) : (p.points.size() % 2 != 0);
+                    });
+                std::cout << count << std::endl;
+            }
+        };
 
         int main(int argc, char** argv) {
+            if (argc != 2) {
+                std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+                return EXIT_FAILURE;
+            }
             try {
-                if (argc != 2) {
-                    std::cerr << "Error: Filename not provided." << std::endl;
-                    return EXIT_FAILURE;
-                }
-
-                std::vector<Polygon> polygons = readPolygons(argv[1]);
-                processCommands(polygons);
+                CommandProcessor cmd(argv[1]);
+                cmd.processCommands();
             }
             catch (const std::exception& e) {
                 std::cerr << "Error: " << e.what() << std::endl;
