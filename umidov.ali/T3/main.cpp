@@ -101,50 +101,22 @@
                         std::cout << count << std::endl;
                     }
                     else {
+                        int numVertices;
                         try {
-                            int numVertices = std::stoi(type);
+                            numVertices = std::stoi(type);
+                        }
+                        catch (const std::invalid_argument& ia) {
+                            std::cout << "<INVALID COMMAND>" << std::endl;
+                            continue;
+                        }
+                        if (numVertices < 3) {
+                            std::cout << "<INVALID COMMAND>" << std::endl;
+                        }
+                        else {
                             int count = std::count_if(polygons.begin(), polygons.end(), [numVertices](const Polygon& poly) {
                                 return static_cast<int>(poly.points.size()) == numVertices;
                                 });
                             std::cout << count << std::endl;
-                        }
-                        catch (const std::invalid_argument& ia) {
-                            std::cout << "INVALID COMMAND" << std::endl;
-                        }
-                    }
-                }
-                else if (command == "AREA") {
-                    std::string type;
-                    iss >> type;
-                    if (type == "MEAN") {
-                        if (!polygons.empty()) {
-                            double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                                [](double acc, const Polygon& poly) { return acc + polygonArea(poly); });
-                            std::cout << std::fixed << std::setprecision(1) << totalArea / polygons.size() << std::endl;
-                        }
-                        else {
-                            std::cout << "0.0" << std::endl;
-                        }
-                    }
-                    else if (type == "EVEN" || type == "ODD") {
-                        bool isEven = (type == "EVEN");
-                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                            [isEven](double acc, const Polygon& poly) {
-                                return ((poly.points.size() % 2 == 0) == isEven) ? acc + polygonArea(poly) : acc;
-                            });
-                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
-                    }
-                    else {
-                        try {
-                            int numVertices = std::stoi(type);
-                            double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                                [numVertices](double acc, const Polygon& poly) {
-                                    return (static_cast<int>(poly.points.size()) == numVertices) ? acc + polygonArea(poly) : acc;
-                                });
-                            std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
-                        }
-                        catch (const std::invalid_argument& ia) {
-                            std::cout << "INVALID COMMAND" << std::endl;
                         }
                     }
                 }
