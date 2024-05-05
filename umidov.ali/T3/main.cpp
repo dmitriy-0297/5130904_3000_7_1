@@ -6,9 +6,6 @@
         #include <functional>
         #include <cmath>
         #include <sstream>
-        #include <limits>
-        #include <map>
-        #include <numeric>
         #include <iomanip>
 
         struct Point {
@@ -70,6 +67,7 @@
             std::vector<Polygon> polygons;
             std::ifstream file(filename);
             if (!file) {
+                std::cerr << "Error opening file: " << filename << std::endl;
                 throw std::runtime_error("Unable to open file");
             }
             std::string line;
@@ -78,6 +76,9 @@
                 Polygon poly;
                 if (iss >> poly) {
                     polygons.push_back(poly);
+                }
+                else {
+                    std::cerr << "Failed to parse polygon from line: " << line << std::endl;
                 }
             }
             return polygons;
@@ -106,6 +107,9 @@
                         }
                     }
                     catch (const std::invalid_argument&) {
+                        std::cout << "<INVALID COMMAND>" << std::endl;
+                    }
+                    catch (const std::out_of_range&) {
                         std::cout << "<INVALID COMMAND>" << std::endl;
                     }
                 }
