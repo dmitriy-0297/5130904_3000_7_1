@@ -1,139 +1,151 @@
         #include <iostream>
-        #include <vector>
         #include <fstream>
+        #include <vector>
         #include <string>
-        #include <sstream>
         #include <algorithm>
         #include <functional>
-        #include <iomanip>
         #include <cmath>
+        #include <sstream>
+        #include <limits>
+        #include <map>
+        #include <numeric>
+        #include <iomanip>
 
-        struct Point
-        {
-            int x;
-            int y;
+        struct Point {
+            int x, y;
         };
 
-        struct Polygon
-        {
+        struct Polygon {
             std::vector<Point> points;
 
-            double area() const
-            {
-                double totalArea = 0.0;
-                for (size_t i = 0, j = points.size() - 1; i < points.size(); j = i++)
-                {
-                    totalArea += (points[j].x + points[i].x) * (points[j].y - points[i].y);
+            bool operator==(const Polygon& other) const {
+                if (points.size() != other.points.size()) return false;
+                for (size_t i = 0; i < points.size(); ++i) {
+                    if (points[i].x != other.points[i].x || points[i].y != other.points[i].y) return false;
                 }
-                return std::abs(totalArea / 2.0);
+                return true;
             }
         };
 
-        std::istream& operator>>(std::istream& is, Point& point)
-        {
-            char delim1, delim2, delim3;
-            if (!(is >> delim1 >> point.x >> delim2 >> point.y >> delim3))
-            {
-                is.setstate(std::ios::failbit);
-            }
-            return is;
+        std::istream& operator>>(std::istream& is, Point& p) {
+            char ignore;
+            return is >> ignore >> p.x >> ignore >> p.y >> ignore;
         }
 
-        std::istream& operator>>(std::istream& is, Polygon& poly)
-        {
-            size_t numVertices;
+        std::istream& operator>>(std::istream& is, Polygon& poly) {
+            int numVertices;
+            char ch;
             is >> numVertices;
-            poly.points.resize(numVertices);
-            for (Point& point : poly.points)
-            {
-                is >> point;
+            poly.points.clear();
+            for (int i = 0; i < numVertices; ++i) {
+                Point point;
+                if (!(is >> ch >> point.x >> ch >> point.y >> ch)) {
+                    is.setstate(std::ios::failbit);
+                    break;
+                }
+                poly.points.push_back(point);
             }
             return is;
         }
 
-        void processAreaCommand(
-            const std::vector<Polygon>& polygons,
-            const std::string& criteria
-        )
-        {
-            double totalArea = 0.0;
-            int count = 0;
-            for (const auto& poly : polygons)
-            {
-                if ((criteria == "ODD" && (poly.points.size() % 2 != 0)) ||
-                    (criteria == "EVEN" && (poly.points.size() % 2 == 0)) ||
-                    (criteria == "MEAN"))
-                {
-                    totalArea += poly.area();
-                    if (criteria == "MEAN")
-                    {
-                        count++;
-                    }
-                }
+        double polygonArea(const Polygon& poly) {
+            double area = 0.0;
+            int j = poly.points.size() - 1;
+            for (size_t i = 0; i < poly.points.size(); i++) {
+                area += (poly.points[j].x + poly.points[i].x) * (poly.points[j].y - poly.points[i].y);
+                j = i;
             }
-            if (criteria == "MEAN" && count > 0) {
-                totalArea /= count;
-            }
-            std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+            return std::abs(area / 2.0);
         }
 
-        void processCountCommand(
-            const std::vector<Polygon>& polygons,
-            const std::string& criteria
-        )
-        {
-            int count = std::count_if(
-                polygons.begin(), polygons.end(),
-                [criteria](const Polygon& poly)
-                {
-                    return (criteria == "ODD" && (poly.points.size() % 2 != 0)) ||
-                        (criteria == "EVEN" && (poly.points.size() % 2 == 0));
+        std::vector<Polygon> readPolygons(const std::string& filename) {
+            std::vector<Polygon> polygons;
+            std::ifstream file(filename);
+            std::string line;
+
+            while (std::getline(file, line)) {
+                std::istringstream iss(line);
+                Polygon poly;
+                if (iss >> poly) {
+                    polygons.push_back(poly);
                 }
-            );
+            }
+            return polygons;
+        }
+
+        void echoCommand(std::vector<Polygon>& polygons, const Polygon& inputPolygon) {
+            int count = 0;
+            for (size_t i = 0; i < polygons.size(); ++i) {
+                if (polygons[i] == inputPolygon) {
+                    polygons.insert(polygons.begin() + i + 1, inputPolygon);
+                    i++;
+                    count++;
+                }
+            }
             std::cout << count << std::endl;
         }
 
-        int main(int argc, char* argv[])
-        {
+        void processCommands(std::vector<Polygon>& polygons) {
+            std::string commandLine;
+            while (getline(std::cin, commandLine)) {
+                std::istringstream iss(commandLine);
+                std::string command;
+                iss >> command;
+
+                if (command == "AREA") {
+                    std::string param;
+                    iss >> param;
+                    if (param == "MEAN") {
+                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                            [](double acc, const Polygon& poly) { return acc + polygonArea(poly); });
+                        std::cout << std::fixed << std::setprecision(1) << totalArea / polygons.size() << std::endl;
+                    }
+                    else if (param == "EVEN" || param == "ODD") {
+                        bool isEven = (param == "EVEN");
+                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                            [isEven](double acc, const Polygon& poly) {
+                                if ((poly.points.size() % 2 == 0) == isEven) {
+                                    return acc + polygonArea(poly);
+                                }
+                                return acc;
+                            });
+                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+                    }
+                    else {
+                        int numVertices = std::stoi(param);
+                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                            [numVertices](double acc, const Polygon& poly) {
+                                if (poly.points.size() == numVertices) {
+                                    return acc + polygonArea(poly);
+                                }
+                                return acc;
+                            });
+                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+                    }
+                }
+                else if (command == "ECHO") {
+                    Polygon inputPolygon;
+                    if (iss >> inputPolygon) {
+                        echoCommand(polygons, inputPolygon);
+                    }
+                    else {
+                        std::cout << "INVALID COMMAND" << std::endl;
+                    }
+                }
+                else {
+                    std::cout << "INVALID COMMAND" << std::endl;
+                }
+            }
+        }
+
+        int main(int argc, char** argv) {
             if (argc != 2) {
-                std::cerr << "Usage: " << argv[0] << " <filename>\n";
-                return 1;
+                std::cerr << "Error: Filename not provided." << std::endl;
+                return EXIT_FAILURE;
             }
 
-            std::ifstream inFile(argv[1]);
-            if (!inFile)
-            {
-                std::cerr << "Error opening file: " << argv[1] << std::endl;
-                return 1;
-            }
+            std::vector<Polygon> polygons = readPolygons(argv[1]);
+            processCommands(polygons);
 
-            std::vector<Polygon> polygons;
-            Polygon poly;
-            while (inFile >> poly)
-            {
-                polygons.push_back(poly);
-            }
-
-            std::string command;
-            while (std::cin >> command)
-            {
-                if (command == "AREA")
-                {
-                    std::string type;
-                    std::cin >> type;
-                    processAreaCommand(polygons, type);
-                }
-                else if (command == "COUNT")
-                {
-                    std::string type;
-                    std::cin >> type;
-                    processCountCommand(polygons, type);
-                }
-                else
-                {
-                    std::cout << "<INVALID COMMAND>\n";
-                }
-            }
-
-            return 0;
+            return EXIT_SUCCESS;
         }
