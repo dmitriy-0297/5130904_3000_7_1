@@ -122,7 +122,7 @@
                 if (type == "EVEN" || type == "ODD") {
                     int parity = (type == "EVEN") ? 0 : 1;
                     int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-                        return (p.points.size() % 2 == parity);
+                        return static_cast<int>(p.points.size()) % 2 == parity;
                         });
                     std::cout << count << std::endl;
                 }
@@ -132,7 +132,7 @@
                         throw std::runtime_error("<INVALID COMMAND>");
                     }
                     int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                        return p.points.size() == vertexCount;
+                        return static_cast<int>(p.points.size()) == vertexCount;
                         });
                     std::cout << count << std::endl;
                 }
