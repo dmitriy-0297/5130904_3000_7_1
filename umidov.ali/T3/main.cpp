@@ -94,27 +94,27 @@
             std::vector<Polygon> polygons;
 
             void handleCountCommand(const std::string& type) {
-                int count = 0;
                 if (type == "EVEN" || type == "ODD") {
-                    int parity = (type == "EVEN") ? 0 : 1;
-                    count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+                    auto parity = static_cast<std::vector<Point>::size_type>((type == "EVEN") ? 0 : 1);
+                    int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
                         return (p.points.size() % 2 == parity);
                         });
+                    std::cout << count << std::endl;
                 }
                 else {
                     try {
-                        int vertexCount = std::stoi(type);
-                        count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
+                        auto vertexCount = static_cast<std::vector<Point>::size_type>(std::stoi(type));
+                        int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
                             return (p.points.size() == vertexCount);
                             });
+                        std::cout << count << std::endl;
                     }
-                    catch (const std::exception&) {
+                    catch (...) {
                         std::cout << "<INVALID COMMAND>" << std::endl;
-                        return;
                     }
                 }
-                std::cout << count << std::endl;
             }
+
 
             void handleAreaCommand(const std::string& type) {
                 if (type != "MEAN" || polygons.empty()) {
