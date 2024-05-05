@@ -106,17 +106,33 @@
             }
 
             void handleAreaCommand(const std::string& type) {
-                if (type != "MEAN") {
+                double result = 0.0;
+                if (type == "MEAN") {
+                    if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
+                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
+                        return acc + p.area();
+                        }) / polygons.size();
+                }
+                else if (type == "EVEN" || type == "ODD") {
+                    int parity = (type == "EVEN") ? 0 : 1;
+                    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        [parity](double acc, const Polygon& p) {
+                            if (static_cast<int>(p.points.size()) % 2 == parity) {
+                                return acc + p.area();
+                            }
+                            return acc;
+                        });
+                    if (totalArea == 0 && !polygons.empty()) {
+                        throw std::runtime_error("<INVALID COMMAND>"); // No polygons of the specified type
+                    }
+                    result = totalArea;
+                }
+                else {
                     throw std::runtime_error("<INVALID COMMAND>");
                 }
-                if (polygons.empty()) {
-                    throw std::runtime_error("<INVALID COMMAND>");
-                }
-                double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
-                    return acc + p.area();
-                    }) / polygons.size();
-                    std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
             }
+
 
             void handleCountCommand(const std::string& type) {
                 int count = 0;
