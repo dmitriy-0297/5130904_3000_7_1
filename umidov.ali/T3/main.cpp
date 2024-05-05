@@ -28,10 +28,12 @@
             };
 
             std::istream& operator>>(std::istream& is, Polygon& poly) {
-                int numPoints;
+                int numPoints = 0;
                 is >> numPoints;
                 poly.points.resize(numPoints);
                 for (int i = 0; i < numPoints; ++i) {
+                    poly.points[i].x = 0;
+                    poly.points[i].y = 0;
                     is >> poly.points[i].x >> poly.points[i].y;
                 }
                 return is;
