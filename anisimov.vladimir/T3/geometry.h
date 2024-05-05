@@ -14,5 +14,4 @@ struct Polygon {
 
 double polygonArea(const Polygon& polygon);
 std::vector<Polygon> readPolygonsFromFile(const std::string& filename);
-
 #endif
