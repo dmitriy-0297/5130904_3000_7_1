@@ -41,7 +41,7 @@
                 Point point;
                 if (!(is >> ch >> point.x >> ch >> point.y >> ch)) {
                     is.setstate(std::ios::failbit);
-                    break;
+                    return is;
                 }
                 poly.points.push_back(point);
             }
@@ -61,8 +61,10 @@
         std::vector<Polygon> readPolygons(const std::string& filename) {
             std::vector<Polygon> polygons;
             std::ifstream file(filename);
+            if (!file) {
+                throw std::runtime_error("Unable to open file");
+            }
             std::string line;
-
             while (std::getline(file, line)) {
                 std::istringstream iss(line);
                 Polygon poly;
@@ -139,13 +141,18 @@
         }
 
         int main(int argc, char** argv) {
-            if (argc != 2) {
-                std::cerr << "Error: Filename not provided." << std::endl;
+            try {
+                if (argc != 2) {
+                    std::cerr << "Error: Filename not provided." << std::endl;
+                    return EXIT_FAILURE;
+                }
+
+                std::vector<Polygon> polygons = readPolygons(argv[1]);
+                processCommands(polygons);
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error: " << e.what() << std::endl;
                 return EXIT_FAILURE;
             }
-
-            std::vector<Polygon> polygons = readPolygons(argv[1]);
-            processCommands(polygons);
-
             return EXIT_SUCCESS;
         }
