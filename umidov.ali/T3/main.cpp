@@ -6,6 +6,7 @@
         #include <functional>
         #include <cmath>
         #include <sstream>
+        #include <limits>
         #include <iomanip>
         #include <stdexcept>
         #include <numeric>
@@ -45,6 +46,7 @@
                     return is;
                 }
                 poly.points.clear();
+                poly.points.reserve(count);
                 for (int i = 0; i < count; i++) {
                     Point p;
                     if (!(is >> p)) {
@@ -108,20 +110,11 @@
             }
 
             void handleAreaCommand(const std::string& type) {
-                if (type == "MEAN") {
-                    if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
+                if (type == "MEAN" && !polygons.empty()) {
                     double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
                         return acc + p.area();
                         }) / polygons.size();
                         std::cout << std::fixed << std::setprecision(1) << result << std::endl;
-                }
-                else if (type == "EVEN" || type == "ODD") {
-                    int parity = (type == "EVEN") ? 0 : 1;
-                    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [parity](double acc, const Polygon& p) {
-                            return (p.points.size() % 2 == parity) ? acc + p.area() : acc;
-                        });
-                    std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
                 }
                 else {
                     std::cout << "<INVALID COMMAND>" << std::endl;
@@ -132,7 +125,7 @@
                 try {
                     int vertexCount = std::stoi(type);
                     int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                        return p.points.size() == vertexCount;
+                        return static_cast<int>(p.points.size()) == vertexCount;
                         });
                     std::cout << count << std::endl;
                 }
