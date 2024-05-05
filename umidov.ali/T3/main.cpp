@@ -7,12 +7,12 @@
         #include <cmath>
         #include <sstream>
         #include <limits>
-        #include <map>
         #include <numeric>
         #include <iomanip>
 
         struct Point {
-            int x, y;
+            int x = 0;
+            int y = 0;
         };
 
         struct Polygon {
@@ -29,19 +29,26 @@
 
         std::istream& operator>>(std::istream& is, Point& p) {
             char ignore;
-            return is >> ignore >> p.x >> ignore >> p.y >> ignore;
+            if (!(is >> ignore >> p.x >> ignore >> p.y >> ignore)) {
+                is.setstate(std::ios::failbit);
+            }
+            return is;
         }
 
         std::istream& operator>>(std::istream& is, Polygon& poly) {
             int numVertices;
             char ch;
-            is >> numVertices;
+            if (!(is >> numVertices) || numVertices < 1) {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
             poly.points.clear();
+            poly.points.reserve(numVertices);
+            Point point;
             for (int i = 0; i < numVertices; ++i) {
-                Point point;
                 if (!(is >> ch >> point.x >> ch >> point.y >> ch)) {
                     is.setstate(std::ios::failbit);
-                    return is;
+                    break;
                 }
                 poly.points.push_back(point);
             }
@@ -75,17 +82,6 @@
             return polygons;
         }
 
-        void echoCommand(std::vector<Polygon>& polygons, const Polygon& inputPolygon) {
-            int count = 0;
-            for (size_t i = 0; i < polygons.size(); ++i) {
-                if (polygons[i] == inputPolygon) {
-                    polygons.insert(polygons.begin() + i + 1, inputPolygon);
-                    i++;
-                    count++;
-                }
-            }
-            std::cout << count << std::endl;
-        }
         void processCommands(std::vector<Polygon>& polygons) {
             std::string commandLine;
             while (getline(std::cin, commandLine)) {
@@ -93,44 +89,62 @@
                 std::string command;
                 iss >> command;
 
-                if (command == "AREA") {
-                    std::string param;
-                    iss >> param;
-                    if (param == "MEAN") {
-                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                            [](double acc, const Polygon& poly) { return acc + polygonArea(poly); });
-                        std::cout << std::fixed << std::setprecision(1) << totalArea / polygons.size() << std::endl;
-                    }
-                    else if (param == "EVEN" || param == "ODD") {
-                        bool isEven = (param == "EVEN");
-                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                            [isEven](double acc, const Polygon& poly) {
-                                if ((poly.points.size() % 2 == 0) == isEven) {
-                                    return acc + polygonArea(poly);
-                                }
-                                return acc;
+                if (command == "COUNT") {
+                    std::string type;
+                    iss >> type;
+                    if (type == "EVEN" || type == "ODD") {
+                        bool isEven = (type == "EVEN");
+                        int count = std::count_if(polygons.begin(), polygons.end(), [isEven](const Polygon& poly) {
+                            return (poly.points.size() % 2 == 0) == isEven;
                             });
-                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+                        std::cout << count << std::endl;
                     }
                     else {
-                        int numVertices = std::stoi(param);
-                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                            [numVertices](double acc, const Polygon& poly) {
-                                if (poly.points.size() == static_cast<size_t>(numVertices)) {
-                                    return acc + polygonArea(poly);
-                                }
-                                return acc;
-                            });
-                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+                        try {
+                            int numVertices = std::stoi(type);
+                            int count = std::count_if(polygons.begin(), polygons.end(), [numVertices](const Polygon& poly) {
+                                return poly.points.size() == numVertices;
+                                });
+                            std::cout << count << std::endl;
+                        }
+                        catch (const std::invalid_argument& ia) {
+                            std::cout << "INVALID COMMAND" << std::endl;
+                        }
                     }
                 }
-                else if (command == "ECHO") {
-                    Polygon inputPolygon;
-                    if (iss >> inputPolygon) {
-                        echoCommand(polygons, inputPolygon);
+                else if (command == "AREA") {
+                    std::string type;
+                    iss >> type;
+                    if (type == "MEAN") {
+                        if (!polygons.empty()) {
+                            double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                                [](double acc, const Polygon& poly) { return acc + polygonArea(poly); });
+                            std::cout << std::fixed << std::setprecision(1) << totalArea / polygons.size() << std::endl;
+                        }
+                        else {
+                            std::cout << "0.0" << std::endl;
+                        }
+                    }
+                    else if (type == "EVEN" || type == "ODD") {
+                        bool isEven = (type == "EVEN");
+                        double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                            [isEven](double acc, const Polygon& poly) {
+                                return ((poly.points.size() % 2 == 0) == isEven) ? acc + polygonArea(poly) : acc;
+                            });
+                        std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
                     }
                     else {
-                        std::cout << "INVALID COMMAND" << std::endl;
+                        try {
+                            int numVertices = std::stoi(type);
+                            double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                                [numVertices](double acc, const Polygon& poly) {
+                                    return (poly.points.size() == numVertices) ? acc + polygonArea(poly) : acc;
+                                });
+                            std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
+                        }
+                        catch (const std::invalid_argument& ia) {
+                            std::cout << "INVALID COMMAND" << std::endl;
+                        }
                     }
                 }
                 else {
