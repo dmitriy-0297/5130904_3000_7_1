@@ -113,6 +113,7 @@
             }
 
 
+
             void handleAreaCommand(const std::string& type) {
                 if (type == "MEAN") {
                     if (polygons.empty()) {
