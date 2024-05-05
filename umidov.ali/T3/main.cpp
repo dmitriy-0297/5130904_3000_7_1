@@ -7,6 +7,7 @@
         #include <cmath>
         #include <sstream>
         #include <limits>
+        #include <map>
         #include <numeric>
         #include <iomanip>
 
@@ -103,7 +104,7 @@
                         try {
                             int numVertices = std::stoi(type);
                             int count = std::count_if(polygons.begin(), polygons.end(), [numVertices](const Polygon& poly) {
-                                return poly.points.size() == numVertices;
+                                return static_cast<int>(poly.points.size()) == numVertices;
                                 });
                             std::cout << count << std::endl;
                         }
@@ -138,7 +139,7 @@
                             int numVertices = std::stoi(type);
                             double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                                 [numVertices](double acc, const Polygon& poly) {
-                                    return (poly.points.size() == numVertices) ? acc + polygonArea(poly) : acc;
+                                    return (static_cast<int>(poly.points.size()) == numVertices) ? acc + polygonArea(poly) : acc;
                                 });
                             std::cout << std::fixed << std::setprecision(1) << totalArea << std::endl;
                         }
