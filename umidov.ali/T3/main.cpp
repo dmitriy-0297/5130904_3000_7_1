@@ -10,6 +10,7 @@
         #include <iomanip>
         #include <stdexcept>
         #include <numeric>
+        #include <cctype>
 
         namespace tretyak {
 
@@ -105,37 +106,42 @@
             }
 
             void handleAreaCommand(const std::string& type) {
-                double result = 0.0;
-                if (type == "MEAN") {
-                    if (polygons.empty()) throw std::runtime_error("<INVALID COMMAND>");
-                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
-                        return acc + p.area();
-                        }) / polygons.size();
-                }
-                else {
+                if (type != "MEAN") {
                     throw std::runtime_error("<INVALID COMMAND>");
                 }
-                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+                if (polygons.empty()) {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+                double result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
+                    return acc + p.area();
+                    }) / polygons.size();
+                    std::cout << std::fixed << std::setprecision(1) << result << std::endl;
             }
 
             void handleCountCommand(const std::string& type) {
+                int count = 0;
                 if (type == "EVEN" || type == "ODD") {
                     int parity = (type == "EVEN") ? 0 : 1;
-                    int count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-                        return static_cast<int>(p.points.size()) % 2 == parity;
+                    count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+                        return (static_cast<int>(p.points.size()) % 2 == parity);
                         });
-                    std::cout << count << std::endl;
                 }
                 else {
-                    int vertexCount = std::stoi(type);
-                    if (vertexCount < 3) {
+                    int vertexCount;
+                    try {
+                        vertexCount = std::stoi(type);
+                        if (vertexCount < 3) {
+                            throw std::runtime_error("<INVALID COMMAND>");
+                        }
+                        count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
+                            return static_cast<int>(p.points.size()) == vertexCount;
+                            });
+                    }
+                    catch (std::invalid_argument&) {
                         throw std::runtime_error("<INVALID COMMAND>");
                     }
-                    int count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                        return static_cast<int>(p.points.size()) == vertexCount;
-                        });
-                    std::cout << count << std::endl;
                 }
+                std::cout << count << std::endl;
             }
         };
 
