@@ -39,7 +39,7 @@
         std::istream& operator>>(std::istream& is, Polygon& poly) {
             int numVertices;
             char ch;
-            if (!(is >> numVertices) || numVertices < 1) {
+            if (!(is >> numVertices) || numVertices < 3) {
                 is.setstate(std::ios::failbit);
                 return is;
             }
@@ -93,22 +93,8 @@
                 if (command == "COUNT") {
                     std::string type;
                     iss >> type;
-                    if (type == "EVEN" || type == "ODD") {
-                        bool isEven = (type == "EVEN");
-                        int count = std::count_if(polygons.begin(), polygons.end(), [isEven](const Polygon& poly) {
-                            return (poly.points.size() % 2 == 0) == isEven;
-                            });
-                        std::cout << count << std::endl;
-                    }
-                    else {
-                        int numVertices;
-                        try {
-                            numVertices = std::stoi(type);
-                        }
-                        catch (const std::invalid_argument& ia) {
-                            std::cout << "<INVALID COMMAND>" << std::endl;
-                            continue;
-                        }
+                    try {
+                        int numVertices = std::stoi(type);
                         if (numVertices < 3) {
                             std::cout << "<INVALID COMMAND>" << std::endl;
                         }
@@ -118,6 +104,9 @@
                                 });
                             std::cout << count << std::endl;
                         }
+                    }
+                    catch (const std::invalid_argument&) {
+                        std::cout << "<INVALID COMMAND>" << std::endl;
                     }
                 }
                 else {
