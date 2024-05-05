@@ -32,15 +32,14 @@
 
             std::istream& operator>>(std::istream& is, Polygon& poly) {
                 int numPoints;
-                is >> numPoints;
-                if (is.fail() || numPoints < 3) {
+                if (!(is >> numPoints) || numPoints < 3) {
                     is.setstate(std::ios::failbit);
                     return is;
                 }
                 poly.points.resize(numPoints);
                 for (int i = 0; i < numPoints; ++i) {
-                    is >> poly.points[i].x >> poly.points[i].y;
-                    if (is.fail()) {
+                    if (!(is >> poly.points[i].x >> poly.points[i].y)) {
+                        is.setstate(std::ios::failbit);
                         return is;
                     }
                 }
@@ -115,8 +114,6 @@
                 }
             }
 
-
-
             void handleAreaCommand(const std::string& type) {
                 if (type != "MEAN" || polygons.empty()) {
                     std::cout << "<INVALID COMMAND>" << std::endl;
@@ -163,7 +160,6 @@
                     std::cout << "<INVALID COMMAND>" << std::endl;
                 }
             }
-
         };
 
         int main(int argc, char** argv) {
