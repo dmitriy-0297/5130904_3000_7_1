@@ -14,12 +14,14 @@
         namespace tretyak {
             struct Point {
                 int x, y;
+                Point() : x(0), y(0) {}
             };
 
             struct Polygon {
                 std::vector<Point> points;
 
                 double area() const {
+                    if (points.size() < 3) return 0.0;
                     double totalArea = 0.0;
                     for (size_t i = 0, j = points.size() - 1; i < points.size(); j = i++) {
                         totalArea += (points[j].x + points[i].x) * (points[j].y - points[i].y);
@@ -30,10 +32,16 @@
 
             std::istream& operator>>(std::istream& is, Polygon& poly) {
                 int numPoints;
-                is >> numPoints;
+                if (!(is >> numPoints) || numPoints < 3) {
+                    is.setstate(std::ios::failbit);
+                    return is;
+                }
                 poly.points.resize(numPoints);
                 for (int i = 0; i < numPoints; ++i) {
-                    is >> poly.points[i].x >> poly.points[i].y;
+                    if (!(is >> poly.points[i].x >> poly.points[i].y)) {
+                        is.setstate(std::ios::failbit);
+                        return is;
+                    }
                 }
                 return is;
             }
@@ -127,24 +135,29 @@
 
             void handleMaxCommand(const std::string& type) {
                 if (polygons.empty()) {
-                    throw std::runtime_error("<INVALID COMMAND>");
+                    std::cout << "<INVALID COMMAND>" << std::endl;
+                    return;
                 }
+
                 if (type == "AREA") {
-                    auto maxIt = std::max_element(polygons.begin(), polygons.end(), [](const Polygon& a, const Polygon& b) {
-                        return a.area() < b.area();
+                    auto maxIt = std::max_element(polygons.begin(), polygons.end(),
+                        [](const Polygon& a, const Polygon& b) {
+                            return a.area() < b.area();
                         });
                     std::cout << std::fixed << std::setprecision(1) << maxIt->area() << std::endl;
                 }
                 else if (type == "VERTEXES") {
-                    auto maxIt = std::max_element(polygons.begin(), polygons.end(), [](const Polygon& a, const Polygon& b) {
-                        return a.points.size() < b.points.size();
+                    auto maxIt = std::max_element(polygons.begin(), polygons.end(),
+                        [](const Polygon& a, const Polygon& b) {
+                            return a.points.size() < b.points.size();
                         });
                     std::cout << maxIt->points.size() << std::endl;
                 }
                 else {
-                    throw std::runtime_error("<INVALID COMMAND>");
+                    std::cout << "<INVALID COMMAND>" << std::endl;
                 }
             }
+
         };
 
         int main(int argc, char** argv) {
