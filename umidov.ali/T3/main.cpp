@@ -109,7 +109,7 @@
                         [](double acc, const Polygon& p) { return acc + p.area(); }) / polygons.size();
                 }
                 else {
-                    int parity = (type == "EVEN") ? 0 : 1;
+                    size_t parity = (type == "EVEN") ? 0 : 1;
                     result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                         [parity](double acc, const Polygon& p) { return (p.points.size() % 2 == parity) ? acc + p.area() : acc; });
                 }
@@ -117,19 +117,17 @@
             }
 
             void handleCountCommand(const std::string& type) {
-                int count = 0;
                 if (type == "EVEN" || type == "ODD") {
-                    int parity = (type == "EVEN") ? 0 : 1;
-                    count = std::count_if(polygons.begin(), polygons.end(),
-                        [parity](const Polygon& p) { return p.points.size() % 2 == parity; });
+                    size_t parity = (type == "EVEN") ? 0 : 1;
+                    std::cout << std::count_if(polygons.begin(), polygons.end(),
+                        [parity](const Polygon& p) { return p.points.size() % 2 == parity; }) << std::endl;
                 }
                 else {
                     int vertexCount = std::stoi(type);
                     if (vertexCount < 3) throw std::runtime_error("Invalid vertex count.");
-                    count = std::count_if(polygons.begin(), polygons.end(),
-                        [vertexCount](const Polygon& p) { return p.points.size() == vertexCount; });
+                    std::cout << std::count_if(polygons.begin(), polygons.end(),
+                        [vertexCount](const Polygon& p) { return static_cast<size_t>(p.points.size()) == static_cast<size_t>(vertexCount); }) << std::endl;
                 }
-                std::cout << count << std::endl;
             }
         };
 
