@@ -12,7 +12,8 @@
         #include <functional>
         #include <cctype>
 
-        namespace geom {
+        namespace vectonix {
+
             struct Point {
                 int x, y;
                 friend std::istream& operator>>(std::istream& is, Point& p) {
@@ -50,99 +51,87 @@
                     return is;
                 }
             };
+
+            void area(const std::vector<Polygon>& data);
+            void min(const std::vector<Polygon>& data);
+            void max(const std::vector<Polygon>& data);
+            void count(const std::vector<Polygon>& data);
+            void echo(std::vector<Polygon>& data);
+            void inframe(const std::vector<Polygon>& data);
         }
 
-        using namespace geom;
+        using namespace vectonix;
+        using namespace std::placeholders;
 
-        class CommandProcessor {
-        public:
-            explicit CommandProcessor(const std::string& filename) {
-                std::ifstream file(filename);
-                if (!file) {
-                    throw std::runtime_error("Unable to open file: " + filename);
-                }
-                Polygon poly;
-                while (file >> poly) {
-                    polygons.push_back(poly);
-                }
-            }
+        void vectonix::area(const std::vector<Polygon>& data) {
 
-            void processCommands() {
-                std::string line;
-                while (getline(std::cin, line)) {
-                    try {
-                        processLine(line);
-                    }
-                    catch (const std::exception& ex) {
-                        std::cout << ex.what() << std::endl;
-                    }
-                }
-            }
+        }
 
-        private:
-            std::vector<Polygon> polygons;
+        void vectonix::min(const std::vector<Polygon>& data) {
 
-            void processLine(const std::string& line) {
-                std::istringstream iss(line);
-                std::string command, type;
-                iss >> command >> type;
-                if (command.empty() || type.empty()) {
-                    throw std::runtime_error("INVALID COMMAND");
-                }
+        }
 
-                if (command == "AREA") {
-                    handleAreaCommand(type);
-                }
-                else if (command == "COUNT") {
-                    handleCountCommand(type);
-                }
-                else {
-                    throw std::runtime_error("INVALID COMMAND");
-                }
-            }
+        void vectonix::max(const std::vector<Polygon>& data) {
 
-            void handleAreaCommand(const std::string& type) {
-                double result = 0.0;
-                if (type == "MEAN") {
-                    if (polygons.empty()) throw std::runtime_error("No polygons available.");
-                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [](double acc, const Polygon& p) { return acc + p.area(); }) / polygons.size();
-                }
-                else {
-                    size_t parity = (type == "EVEN") ? 0 : 1;
-                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [parity](double acc, const Polygon& p) { return (p.points.size() % 2 == parity) ? acc + p.area() : acc; });
-                }
-                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
-            }
+        }
 
-            void handleCountCommand(const std::string& type) {
-                if (type == "EVEN" || type == "ODD") {
-                    size_t parity = (type == "EVEN") ? 0 : 1;
-                    std::cout << std::count_if(polygons.begin(), polygons.end(),
-                        [parity](const Polygon& p) { return p.points.size() % 2 == parity; }) << std::endl;
-                }
-                else {
-                    int vertexCount = std::stoi(type);
-                    if (vertexCount < 3) throw std::runtime_error("Invalid vertex count.");
-                    std::cout << std::count_if(polygons.begin(), polygons.end(),
-                        [vertexCount](const Polygon& p) { return static_cast<size_t>(p.points.size()) == static_cast<size_t>(vertexCount); }) << std::endl;
-                }
-            }
-        };
+        void vectonix::count(const std::vector<Polygon>& data) {
 
-        int main(int argc, char** argv) {
+        }
+
+        void vectonix::echo(std::vector<Polygon>& data) {
+
+        }
+
+        void vectonix::inframe(const std::vector<Polygon>& data) {
+
+        }
+
+        int main(int argc, char* argv[]) {
             if (argc != 2) {
-                std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+                std::cerr << "Error: Expected 1 command-line argument, but got " << argc - 1 << ".\n";
                 return EXIT_FAILURE;
             }
-            try {
-                CommandProcessor cmd(argv[1]);
-                cmd.processCommands();
-            }
-            catch (const std::exception& e) {
-                std::cerr << "Error: " << e.what() << std::endl;
+            std::string fileName = argv[1];
+            std::ifstream file(fileName);
+            if (!file) {
+                std::cerr << "Error: file didn't open\n";
                 return EXIT_FAILURE;
             }
-            return EXIT_SUCCESS;
+
+            std::cout << std::setprecision(1) << std::fixed;
+            std::vector<vectonix::Polygon> vec;
+            while (!file.eof()) {
+                std::copy(
+                    std::istream_iterator<vectonix::Polygon>(file),
+                    std::istream_iterator<vectonix::Polygon>(),
+                    std::back_inserter(vec)
+                );
+                if (!file.eof() && file.fail()) {
+                    file.clear();
+                    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+            }
+            while (!std::cin.eof()) {
+                std::cin.clear();
+                std::string command;
+                std::cin >> command;
+                try {
+                    if (command == "AREA") vectonix::area(vec);
+                    else if (command == "MIN") vectonix::min(vec);
+                    else if (command == "MAX") vectonix::max(vec);
+                    else if (command == "COUNT") vectonix::count(vec);
+                    else if (command == "ECHO") vectonix::echo(vec);
+                    else if (command == "INFRAME") vectonix::inframe(vec);
+                    else if (!std::cin.eof()) {
+                        throw std::runtime_error("<INVALID COMMAND>");
+                    }
+                }
+                catch (std::exception& ex) {
+                    std::cout << ex.what() << '\n';
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+            }
+            return 0;
         }
