@@ -4,137 +4,155 @@
         #include <string>
         #include <algorithm>
         #include <functional>
-        #include <numeric>
-        #include <iomanip>
-        #include <sstream>
-        #include <iterator>
-        #include <exception>
-        #include <limits>
         #include <cmath>
-
-        const std::string INVALID_COMMAND = "<INVALID COMMAND>";
-        const std::string MEAN = "MEAN";
-        const std::string EVEN = "EVEN";
-        const std::string ODD = "ODD";
+        #include <sstream>
+        #include <limits>
+        #include <iomanip>
+        #include <stdexcept>
+        #include <numeric>
+        #include <cctype>
 
         namespace tretyak {
             struct Point {
                 int x, y;
 
-                Point(int x = 0, int y = 0) : x(x), y(y) {}
-
-                friend std::istream& operator>>(std::istream& in, Point& p) {
-                    in >> p.x >> p.y;
-                    return in;
-                }
-
-                friend std::ostream& operator<<(std::ostream& out, const Point& p) {
-                    out << '(' << p.x << ", " << p.y << ')';
-                    return out;
+                friend std::istream& operator>>(std::istream& is, Point& p) {
+                    char ch1, ch2, ch3;
+                    if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
+                        is.setstate(std::ios::failbit);
+                    }
+                    return is;
                 }
             };
 
-            class Polygon {
+            struct Polygon {
                 std::vector<Point> points;
 
-            public:
-                void addPoint(const Point& point) {
-                    points.push_back(point);
-                }
-
                 double area() const {
-                    double area = 0.0;
-                    for (size_t i = 0, j = points.size() - 1; i < points.size(); j = i++) {
-                        area += (points[j].x + points[i].x) * (points[j].y - points[i].y);
+                    double totalArea = 0.0;
+                    for (size_t i = 0; i < points.size(); i++) {
+                        int j = (i + 1) % points.size();
+                        totalArea += points[i].x * points[j].y;
+                        totalArea -= points[j].x * points[i].y;
                     }
-                    return std::abs(area / 2.0);
+                    return std::fabs(totalArea / 2.0);
                 }
 
-                size_t vertexCount() const {
-                    return points.size();
-                }
-
-                friend std::istream& operator>>(std::istream& in, Polygon& polygon) {
+                friend std::istream& operator>>(std::istream& is, Polygon& poly) {
                     int count;
-                    in >> count;
-                    Point temp;
-                    for (int i = 0; i < count; i++) {
-                        in >> temp;
-                        polygon.addPoint(temp);
+                    is >> count;
+                    if (count < 3) {
+                        is.setstate(std::ios::failbit);
+                        return is;
                     }
-                    return in;
-                }
-
-                friend std::ostream& operator<<(std::ostream& out, const Polygon& polygon) {
-                    out << polygon.points.size() << ": ";
-                    for (const auto& point : polygon.points) {
-                        out << point << ' ';
+                    poly.points.resize(count);
+                    for (Point& p : poly.points) {
+                        is >> p;
+                        if (!is) break;
                     }
-                    return out;
+                    return is;
                 }
             };
         }
 
-        namespace cmd {
-            using namespace tretyak;
+        using namespace tretyak;
 
-            double calculateTotalArea(const std::vector<Polygon>& polygons, std::function<bool(const Polygon&)> predicate) {
-                return std::accumulate(polygons.begin(), polygons.end(), 0.0, [&predicate](double total, const Polygon& polygon) {
-                    return total + (predicate(polygon) ? polygon.area() : 0);
-                    });
+        class CommandProcessor {
+        public:
+            explicit CommandProcessor(const std::string& filename) {
+                std::ifstream file(filename);
+                if (!file) {
+                    throw std::runtime_error("Unable to open file: " + filename);
+                }
+                Polygon poly;
+                while (file >> poly) {
+                    polygons.push_back(poly);
+                }
             }
 
-            void processCommands(const std::vector<Polygon>& polygons, const std::string& command, const std::string& parameter) {
+            void processCommands() {
+                std::string line;
+                while (std::getline(std::cin, line)) {
+                    try {
+                        processLine(line);
+                    }
+                    catch (const std::exception& ex) {
+                        std::cout << ex.what() << std::endl;
+                    }
+                }
+            }
+
+        private:
+            std::vector<Polygon> polygons;
+
+            void processLine(const std::string& line) {
+                std::istringstream iss(line);
+                std::string command, type;
+                iss >> command >> type;
+                if (command.empty() || type.empty()) {
+                    throw std::runtime_error("<INVALID COMMAND>");
+                }
+
                 if (command == "AREA") {
-                    if (parameter == EVEN) {
-                        std::cout << "Total area of polygons with an even number of vertices: "
-                            << calculateTotalArea(polygons, [](const Polygon& p) { return p.vertexCount() % 2 == 0; }) << "\n";
-                    }
-                    else if (parameter == ODD) {
-                        std::cout << "Total area of polygons with an odd number of vertices: "
-                            << calculateTotalArea(polygons, [](const Polygon& p) { return p.vertexCount() % 2 != 0; }) << "\n";
-                    }
-                    else if (parameter == MEAN) {
-                        double totalArea = calculateTotalArea(polygons, [](const Polygon&) { return true; });
-                        std::cout << "Mean area of polygons: " << (polygons.empty() ? 0 : totalArea / polygons.size()) << "\n";
-                    }
-                    else {
-                        std::cerr << INVALID_COMMAND << "\n";
-                    }
+                    handleAreaCommand(type);
+                }
+                else if (command == "COUNT") {
+                    handleCountCommand(type);
                 }
                 else {
-                    std::cerr << INVALID_COMMAND << "\n";
+                    throw std::runtime_error("<INVALID COMMAND>");
                 }
             }
-        }
 
-        int main(int argc, char* argv[]) {
+            void handleAreaCommand(const std::string& type) {
+                double result = 0.0;
+                if (type == "MEAN") {
+                    if (polygons.empty()) throw std::runtime_error("No polygons available.");
+                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
+                        return acc + p.area();
+                        }) / polygons.size();
+                }
+                else {
+                    int parity = (type == "EVEN") ? 0 : 1;
+                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        [parity](double acc, const Polygon& p) {
+                            return (static_cast<int>(p.points.size()) % 2 == parity) ? acc + p.area() : acc;
+                        });
+                }
+                std::cout << std::fixed << std::setprecision(1) << result << std::endl;
+            }
+
+            void handleCountCommand(const std::string& type) {
+                int count = 0;
+                if (type == "EVEN" || type == "ODD") {
+                    int parity = (type == "EVEN") ? 0 : 1;
+                    count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
+                        return static_cast<int>(p.points.size()) % 2 == parity;
+                        });
+                }
+                else {
+                    int vertexCount = std::stoi(type);
+                    if (vertexCount < 3) throw std::runtime_error("Invalid vertex count.");
+                    count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
+                        return static_cast<int>(p.points.size()) == vertexCount;
+                        });
+                }
+                std::cout << count << std::endl;
+            }
+        };
+
+        int main(int argc, char** argv) {
             if (argc != 2) {
-                std::cerr << "Usage: " << argv[0] << " <filename>\n";
+                std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
                 return EXIT_FAILURE;
             }
-
-            std::ifstream file(argv[1]);
-            if (!file) {
-                std::cerr << "Error opening file: " << argv[1] << "\n";
+            try {
+                CommandProcessor cmd(argv[1]);
+                cmd.processCommands();
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error: " << e.what() << std::endl;
                 return EXIT_FAILURE;
             }
-
-            std::vector<tretyak::Polygon> polygons;
-            tretyak::Polygon polygon;
-            while (file >> polygon) {
-                polygons.push_back(polygon);
-            }
-
-            std::string command, parameter;
-            while (std::cout << "Enter command and parameter: " && std::cin >> command >> parameter) {
-                try {
-                    cmd::processCommands(polygons, command, parameter);
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "Error: " << e.what() << "\n";
-                }
-            }
-
             return EXIT_SUCCESS;
         }
