@@ -3,19 +3,18 @@
         #include <vector>
         #include <string>
         #include <algorithm>
-        #include <functional>
         #include <cmath>
         #include <sstream>
         #include <limits>
         #include <iomanip>
         #include <stdexcept>
         #include <numeric>
+        #include <functional>
         #include <cctype>
 
-        namespace tretyak {
+        namespace geom {
             struct Point {
                 int x, y;
-
                 friend std::istream& operator>>(std::istream& is, Point& p) {
                     char ch1, ch2, ch3;
                     if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
@@ -27,13 +26,11 @@
 
             struct Polygon {
                 std::vector<Point> points;
-
                 double area() const {
                     double totalArea = 0.0;
                     for (size_t i = 0; i < points.size(); i++) {
                         int j = (i + 1) % points.size();
-                        totalArea += points[i].x * points[j].y;
-                        totalArea -= points[j].x * points[i].y;
+                        totalArea += points[i].x * points[j].y - points[j].x * points[i].y;
                     }
                     return std::fabs(totalArea / 2.0);
                 }
@@ -55,7 +52,7 @@
             };
         }
 
-        using namespace tretyak;
+        using namespace geom;
 
         class CommandProcessor {
         public:
@@ -72,7 +69,7 @@
 
             void processCommands() {
                 std::string line;
-                while (std::getline(std::cin, line)) {
+                while (getline(std::cin, line)) {
                     try {
                         processLine(line);
                     }
@@ -90,7 +87,7 @@
                 std::string command, type;
                 iss >> command >> type;
                 if (command.empty() || type.empty()) {
-                    throw std::runtime_error("<INVALID COMMAND>");
+                    throw std::runtime_error("INVALID COMMAND");
                 }
 
                 if (command == "AREA") {
@@ -100,7 +97,7 @@
                     handleCountCommand(type);
                 }
                 else {
-                    throw std::runtime_error("<INVALID COMMAND>");
+                    throw std::runtime_error("INVALID COMMAND");
                 }
             }
 
@@ -108,16 +105,13 @@
                 double result = 0.0;
                 if (type == "MEAN") {
                     if (polygons.empty()) throw std::runtime_error("No polygons available.");
-                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0, [](double acc, const Polygon& p) {
-                        return acc + p.area();
-                        }) / polygons.size();
+                    result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        [](double acc, const Polygon& p) { return acc + p.area(); }) / polygons.size();
                 }
                 else {
                     int parity = (type == "EVEN") ? 0 : 1;
                     result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        [parity](double acc, const Polygon& p) {
-                            return (static_cast<int>(p.points.size()) % 2 == parity) ? acc + p.area() : acc;
-                        });
+                        [parity](double acc, const Polygon& p) { return (p.points.size() % 2 == parity) ? acc + p.area() : acc; });
                 }
                 std::cout << std::fixed << std::setprecision(1) << result << std::endl;
             }
@@ -126,16 +120,14 @@
                 int count = 0;
                 if (type == "EVEN" || type == "ODD") {
                     int parity = (type == "EVEN") ? 0 : 1;
-                    count = std::count_if(polygons.begin(), polygons.end(), [parity](const Polygon& p) {
-                        return static_cast<int>(p.points.size()) % 2 == parity;
-                        });
+                    count = std::count_if(polygons.begin(), polygons.end(),
+                        [parity](const Polygon& p) { return p.points.size() % 2 == parity; });
                 }
                 else {
                     int vertexCount = std::stoi(type);
                     if (vertexCount < 3) throw std::runtime_error("Invalid vertex count.");
-                    count = std::count_if(polygons.begin(), polygons.end(), [vertexCount](const Polygon& p) {
-                        return static_cast<int>(p.points.size()) == vertexCount;
-                        });
+                    count = std::count_if(polygons.begin(), polygons.end(),
+                        [vertexCount](const Polygon& p) { return p.points.size() == vertexCount; });
                 }
                 std::cout << count << std::endl;
             }
