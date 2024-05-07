@@ -12,7 +12,6 @@ void commandLessArea(const std::vector<Polygon>& polygons, const Polygon& compar
   }
   std::cout << count << std::endl;
 }
-
 void commandMaxSeq(const std::vector<Polygon>& polygons, const Polygon& targetPolygon) {
   int maxSeqCount = 0;
   int currSeqCount = 0;

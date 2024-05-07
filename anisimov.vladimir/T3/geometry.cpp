@@ -15,7 +15,6 @@ double polygonArea(const Polygon& polygon) {
   area = std::abs(area) / 2.0;
   return area;
 }
-
 std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
   std::ifstream file(filename);
   std::vector<Polygon> polygons;
