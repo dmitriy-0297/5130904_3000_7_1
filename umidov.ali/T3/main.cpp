@@ -1,137 +1,131 @@
         #include <iostream>
         #include <fstream>
         #include <vector>
-        #include <string>
         #include <algorithm>
-        #include <cmath>
-        #include <sstream>
-        #include <limits>
-        #include <iomanip>
-        #include <stdexcept>
         #include <numeric>
-        #include <functional>
-        #include <cctype>
+        #include <sstream>
+        #include <cmath>
 
-        namespace vectonix {
+        const std::string INVALID_COMMAND = "<INVALID COMMAND>";
 
-            struct Point {
-                int x, y;
-                friend std::istream& operator>>(std::istream& is, Point& p) {
-                    char ch1, ch2, ch3;
-                    if (!(is >> ch1 >> p.x >> ch2 >> p.y >> ch3) || ch1 != '(' || ch2 != ';' || ch3 != ')') {
-                        is.setstate(std::ios::failbit);
-                    }
-                    return is;
+        struct Point {
+            int x, y;
+
+            Point(int x = 0, int y = 0) : x(x), y(y) {}
+
+            bool operator!=(const Point& other) const {
+                return x != other.x || y != other.y;
+            }
+        };
+
+        struct Polygon {
+            std::vector<Point> points;
+
+            double area() const {
+                double sum = 0;
+                size_t size = points.size();
+                for (size_t i = 0; i < size; ++i) {
+                    const Point& p1 = points[i];
+                    const Point& p2 = points[(i + 1) % size];
+                    sum += (p1.x * p2.y - p2.x * p1.y);
                 }
-            };
+                return std::abs(sum) / 2;
+            }
+        };
 
-            struct Polygon {
-                std::vector<Point> points;
-                double area() const {
-                    double totalArea = 0.0;
-                    for (size_t i = 0; i < points.size(); i++) {
-                        int j = (i + 1) % points.size();
-                        totalArea += points[i].x * points[j].y - points[j].x * points[i].y;
-                    }
-                    return std::fabs(totalArea / 2.0);
+        class CommandProcessor {
+        public:
+            static void execute(std::vector<Polygon>& polygons, const std::string& command) {
+                std::istringstream iss(command);
+                std::string cmd;
+                iss >> cmd;
+
+                if (cmd == "AREA") {
+                    std::string divisor;
+                    iss >> divisor;
+                    area(polygons, divisor);
                 }
-
-                friend std::istream& operator>>(std::istream& is, Polygon& poly) {
-                    int count;
-                    is >> count;
-                    if (count < 3) {
-                        is.setstate(std::ios::failbit);
-                        return is;
-                    }
-                    poly.points.resize(count);
-                    for (Point& p : poly.points) {
-                        is >> p;
-                        if (!is) break;
-                    }
-                    return is;
+                else if (cmd == "MAX") {
+                    max(polygons);
                 }
-            };
+                else if (cmd == "MIN") {
+                    min(polygons);
+                }
+                else {
+                    throw INVALID_COMMAND;
+                }
+            }
 
-            void area(const std::vector<Polygon>& data);
-            void min(const std::vector<Polygon>& data);
-            void max(const std::vector<Polygon>& data);
-            void count(const std::vector<Polygon>& data);
-            void echo(std::vector<Polygon>& data);
-            void inframe(const std::vector<Polygon>& data);
-        }
+        private:
+            static void area(const std::vector<Polygon>& polygons, const std::string& divisor) {
+                if (divisor == "MEAN") {
+                    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        [](double acc, const Polygon& p) { return acc + p.area(); });
+                    std::cout << std::fixed << (totalArea / polygons.size()) << "\n";
+                }
+                else {
+                    int div = (divisor == "EVEN" || divisor == "ODD") ? 2 : std::stoi(divisor);
+                    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        [div](double acc, const Polygon& p) {
+                            return acc + ((p.points.size() % div == 0) ? p.area() : 0);
+                        });
+                    std::cout << std::fixed << totalArea << "\n";
+                }
+            }
 
-        using namespace vectonix;
-        using namespace std::placeholders;
+            static void max(const std::vector<Polygon>& polygons) {
+                if (polygons.empty())
+                    throw INVALID_COMMAND;
+                auto maxArea = std::max_element(polygons.begin(), polygons.end(),
+                    [](const Polygon& p1, const Polygon& p2) { return p1.area() < p2.area(); });
+                std::cout << std::fixed << maxArea->area() << "\n";
+            }
 
-        void vectonix::area(const std::vector<Polygon>& data) {
-
-        }
-
-        void vectonix::min(const std::vector<Polygon>& data) {
-
-        }
-
-        void vectonix::max(const std::vector<Polygon>& data) {
-
-        }
-
-        void vectonix::count(const std::vector<Polygon>& data) {
-
-        }
-
-        void vectonix::echo(std::vector<Polygon>& data) {
-
-        }
-
-        void vectonix::inframe(const std::vector<Polygon>& data) {
-
-        }
+            static void min(const std::vector<Polygon>& polygons) {
+                if (polygons.empty())
+                    throw INVALID_COMMAND;
+                auto minArea = std::min_element(polygons.begin(), polygons.end(),
+                    [](const Polygon& p1, const Polygon& p2) { return p1.area() < p2.area(); });
+                std::cout << std::fixed << minArea->area() << "\n";
+            }
+        };
 
         int main(int argc, char* argv[]) {
             if (argc != 2) {
-                std::cerr << "Error: Expected 1 command-line argument, but got " << argc - 1 << ".\n";
-                return EXIT_FAILURE;
-            }
-            std::string fileName = argv[1];
-            std::ifstream file(fileName);
-            if (!file) {
-                std::cerr << "Error: file didn't open\n";
+                std::cerr << "Usage: " << argv[0] << " <filename>\n";
                 return EXIT_FAILURE;
             }
 
-            std::cout << std::setprecision(1) << std::fixed;
-            std::vector<vectonix::Polygon> vec;
-            while (!file.eof()) {
-                std::copy(
-                    std::istream_iterator<vectonix::Polygon>(file),
-                    std::istream_iterator<vectonix::Polygon>(),
-                    std::back_inserter(vec)
-                );
-                if (!file.eof() && file.fail()) {
-                    file.clear();
-                    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::ifstream file(argv[1]);
+            if (!file) {
+                std::cerr << "Error: failed to open the file.\n";
+                return EXIT_FAILURE;
+            }
+
+            std::vector<Polygon> polygons;
+            std::string line;
+            while (std::getline(file, line)) {
+                std::istringstream iss(line);
+                Polygon poly;
+                int x, y;
+                while (iss >> x >> y) {
+                    poly.points.push_back(Point(x, y));
+                }
+                if (poly.points.size() >= 3) {
+                    polygons.push_back(poly);
                 }
             }
-            while (!std::cin.eof()) {
-                std::cin.clear();
+
+            try {
                 std::string command;
-                std::cin >> command;
-                try {
-                    if (command == "AREA") vectonix::area(vec);
-                    else if (command == "MIN") vectonix::min(vec);
-                    else if (command == "MAX") vectonix::max(vec);
-                    else if (command == "COUNT") vectonix::count(vec);
-                    else if (command == "ECHO") vectonix::echo(vec);
-                    else if (command == "INFRAME") vectonix::inframe(vec);
-                    else if (!std::cin.eof()) {
-                        throw std::runtime_error("<INVALID COMMAND>");
-                    }
-                }
-                catch (std::exception& ex) {
-                    std::cout << ex.what() << '\n';
-                    std::cin.clear();
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                while (std::getline(std::cin, command) && !command.empty()) {
+                    CommandProcessor::execute(polygons, command);
                 }
             }
-            return 0;
+            catch (const std::string& error) {
+                std::cout << error << "\n";
+                return EXIT_FAILURE;
+            }
+
+            return EXIT_SUCCESS;
         }
