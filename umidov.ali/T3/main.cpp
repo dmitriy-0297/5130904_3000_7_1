@@ -96,19 +96,19 @@
 
             static void count(const std::vector<Polygon>& polygons, const std::string& param) {
                 if (param == "EVEN") {
-                    int count = std::count_if(polygons.begin(), polygons.end(),
+                    size_t count = std::count_if(polygons.begin(), polygons.end(),
                         [](const Polygon& p) { return p.points.size() % 2 == 0; });
                     std::cout << count << "\n";
                 }
                 else if (param == "ODD") {
-                    int count = std::count_if(polygons.begin(), polygons.end(),
+                    size_t count = std::count_if(polygons.begin(), polygons.end(),
                         [](const Polygon& p) { return p.points.size() % 2 != 0; });
                     std::cout << count << "\n";
                 }
                 else {
                     int divisor = std::stoi(param);
-                    int count = std::count_if(polygons.begin(), polygons.end(),
-                        [divisor](const Polygon& p) { return p.points.size() == divisor; });
+                    size_t count = std::count_if(polygons.begin(), polygons.end(),
+                        [divisor](const Polygon& p) { return p.points.size() == static_cast<size_t>(divisor); });
                     std::cout << count << "\n";
                 }
             }
