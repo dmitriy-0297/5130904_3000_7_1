@@ -11,6 +11,7 @@
         #include <limits>
         #include <exception>
 
+
         namespace geometry {
             struct Point {
                 int x_, y_;
@@ -129,9 +130,10 @@
                 return static_cast<int>(sInt);
             }
 
-            void area(std::vector<geometry::Polygon>& polygons, const std::string str) {
+            void area(std::vector<geometry::Polygon>& value, const std::string str) {
                 int data = 0;
-                size_t vSize = polygons.size();
+                int maxDivisor = std::numeric_limits<int>::max();
+                size_t vSize = value.size();
                 data = validStringToInt(str);
                 auto calcArea = [](int divisor, int remains, double initial, const geometry::Polygon& elem) {
                     double rez = initial;
@@ -140,15 +142,15 @@
 
                 if (data == -1) {
                     if (str == "EVEN") {
-                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(value.begin(), value.end(), 0.0,
                             std::bind(calcArea, 2, 0, std::placeholders::_1, std::placeholders::_2)) << "\n";
                     }
                     else if (str == "ODD") {
-                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(value.begin(), value.end(), 0.0,
                             std::bind(calcArea, 2, 1, std::placeholders::_1, std::placeholders::_2)) << "\n";
                     }
-                    else if (str == "MEAN" && polygons.size() != 0) {
-                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(polygons.begin(), polygons.end(), 0.0,
+                    else if (str == "MEAN" && value.size() != 0) {
+                        std::cout << std::fixed << std::setprecision(1) << std::accumulate(value.begin(), value.end(), 0.0,
                             std::bind(calcArea, 2, -1, std::placeholders::_1, std::placeholders::_2)) / vSize << "\n";
                     }
                     else {
@@ -156,32 +158,219 @@
                     }
                 }
                 else if (data > 2) {
-                    std::cout << std::fixed << std::setprecision(1) << std::accumulate(polygons.begin(), polygons.end(), 0.0,
-                        std::bind(calcArea, data, 0, std::placeholders::_1, std::placeholders::_2)) << "\n";
+                    std::cout << std::fixed << std::setprecision(1) << std::accumulate(value.begin(), value.end(), 0.0,
+                        std::bind(calcArea, maxDivisor, data, std::placeholders::_1, std::placeholders::_2)) << "\n";
                 }
                 else {
                     throw I_C;
                 }
             }
+
+            void max(std::vector<geometry::Polygon>& value, const std::string str) {
+                if (value.empty())
+                    throw I_C;
+                if (str == "AREA") {
+                    auto maxArea = *std::max_element(value.begin(), value.end(),
+                        [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                            return p1.area() < p2.area();
+                        });
+                    std::cout << std::fixed << std::setprecision(1) << maxArea.area() << "\n";
+                }
+                else if (str == "VERTEXES") {
+                    auto maxVertexes = *std::max_element(value.begin(), value.end(),
+                        [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                            return p1.points.size() < p2.points.size();
+                        });
+                    std::cout << maxVertexes.points.size() << "\n";
+                }
+                else {
+                    throw I_C;
+                }
+            }
+
+            void min(std::vector<geometry::Polygon>& value, const std::string str) {
+                if (value.empty())
+                    throw I_C;
+                if (str == "AREA") {
+                    auto minArea = *std::min_element(value.begin(), value.end(),
+                        [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                            return p1.area() < p2.area();
+                        });
+                    std::cout << std::fixed << std::setprecision(1) << minArea.area() << "\n";
+                }
+                else if (str == "VERTEXES") {
+                    auto minVertexes = *std::min_element(value.begin(), value.end(),
+                        [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                            return p1.points.size() < p2.points.size();
+                        });
+                    std::cout << minVertexes.points.size() << "\n";
+                }
+                else {
+                    throw I_C;
+                }
+            }
+
+            void count(std::vector<geometry::Polygon>& value, const std::string str) {
+                int data = 0;
+                int maxDivisor = std::numeric_limits<int>::max();
+                data = validStringToInt(str);
+                auto calcConcur = [](int divisor, int remains, size_t initial, const geometry::Polygon& elem) {
+                    return initial + (elem.points.size() % divisor == static_cast<size_t>(remains) || remains == -1 ? 1 : 0);
+                    };
+                if (data == -1) {
+                    if (str == "EVEN") {
+                        std::cout << std::accumulate(value.begin(), value.end(), static_cast<size_t>(0),
+                            std::bind(calcConcur, 2, 0, std::placeholders::_1, std::placeholders::_2)) << "\n";
+                    }
+                    else if (str == "ODD") {
+                        std::cout << std::accumulate(value.begin(), value.end(), static_cast<size_t>(0),
+                            std::bind(calcConcur, 2, 1, std::placeholders::_1, std::placeholders::_2)) << "\n";
+                    }
+                    else if (str == "ALL") {
+                        std::cout << value.size() << "\n";
+                    }
+                    else {
+                        throw I_C;
+                    }
+                }
+                else if (data > 2) {
+                    std::cout << std::accumulate(value.begin(), value.end(), static_cast<size_t>(0),
+                        std::bind(calcConcur, maxDivisor, data, std::placeholders::_1, std::placeholders::_2)) << "\n";
+                }
+                else {
+                    throw I_C;
+                }
+            }
+
+            void filter(std::vector<geometry::Polygon>& value, const std::string str) {
+                int data = 0;
+                int maxDivisor = std::numeric_limits<int>::max();
+                data = validStringToInt(str);
+                auto filterElems = [](int divisor, int remains, std::vector<geometry::Polygon>& storage, const geometry::Polygon& elem) {
+                    if (elem.points.size() % divisor == static_cast<size_t>(remains) || remains == -1) {
+                        storage.push_back(elem);
+                    }
+                    };
+
+                std::vector<geometry::Polygon> filtered;
+                if (data == -1) {
+                    if (str == "EVEN") {
+                        std::for_each(value.begin(), value.end(),
+                            std::bind(filterElems, 2, 0, std::ref(filtered), std::placeholders::_1));
+                    }
+                    else if (str == "ODD") {
+                        std::for_each(value.begin(), value.end(),
+                            std::bind(filterElems, 2, 1, std::ref(filtered), std::placeholders::_1));
+                    }
+                    else {
+                        throw I_C;
+                    }
+                }
+                else if (data > 2) {
+                    std::for_each(value.begin(), value.end(),
+                        std::bind(filterElems, maxDivisor, data, std::ref(filtered), std::placeholders::_1));
+                }
+                else {
+                    throw I_C;
+                }
+
+                std::swap(filtered, value);
+            }
+
+            void sort(std::vector<geometry::Polygon>& value, const std::string str) {
+                if (str == "AREA") {
+                    std::sort(value.begin(), value.end(), [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                        return p1.area() < p2.area();
+                        });
+                }
+                else if (str == "VERTEXES") {
+                    std::sort(value.begin(), value.end(), [](const geometry::Polygon& p1, const geometry::Polygon& p2) {
+                        return p1.points.size() < p2.points.size();
+                        });
+                }
+                else {
+                    throw I_C;
+                }
+            }
+
+            void reverse(std::vector<geometry::Polygon>& value, const std::string) {
+                std::reverse(value.begin(), value.end());
+            }
+
+            void load(std::vector<geometry::Polygon>& value, const std::string filename) {
+                std::ifstream input(filename);
+                if (!input.is_open()) {
+                    std::cout << "Error: could not open file\n";
+                    return;
+                }
+                std::vector<geometry::Polygon> data;
+                geometry::Polygon temp;
+                while (input >> temp) {
+                    data.push_back(temp);
+                }
+                std::swap(data, value);
+            }
+
+            void save(std::vector<geometry::Polygon>& value, const std::string filename) {
+                std::ofstream output(filename);
+                if (!output.is_open()) {
+                    std::cout << "Error: could not open file\n";
+                    return;
+                }
+                for (const auto& elem : value) {
+                    output << elem << "\n";
+                }
+            }
         }
+
 
         int main() {
             std::vector<geometry::Polygon> polygons;
-            std::string command;
-            while (std::getline(std::cin, command)) {
+            std::string line, command, argument;
+            std::istringstream iss;
+
+            while (std::getline(std::cin, line)) {
+                iss.clear();
+                iss.str(line);
+                iss >> command >> std::ws;
+                std::getline(iss, argument);
+
                 try {
-                    if (command == "EXIT")
-                        break;
-                    else if (command.find("AREA") == 0) {
-                        std::istringstream iss(command);
-                        std::string token;
-                        iss >> token >> token;
-                        cmd::area(polygons, token);
+                    if (command == "AREA") {
+                        cmd::area(polygons, argument);
+                    }
+                    else if (command == "MAX") {
+                        cmd::max(polygons, argument);
+                    }
+                    else if (command == "MIN") {
+                        cmd::min(polygons, argument);
+                    }
+                    else if (command == "COUNT") {
+                        cmd::count(polygons, argument);
+                    }
+                    else if (command == "FILTER") {
+                        cmd::filter(polygons, argument);
+                    }
+                    else if (command == "SORT") {
+                        cmd::sort(polygons, argument);
+                    }
+                    else if (command == "REVERSE") {
+                        cmd::reverse(polygons, argument);
+                    }
+                    else if (command == "LOAD") {
+                        cmd::load(polygons, argument);
+                    }
+                    else if (command == "SAVE") {
+                        cmd::save(polygons, argument);
+                    }
+                    else {
+                        std::cout << cmd::I_C << "\n";
                     }
                 }
-                catch (...) {
-                    std::cerr << cmd::I_C << "\n";
+                catch (const std::string& errMsg) {
+                    std::cout << errMsg << "\n";
                 }
             }
+
             return 0;
         }
