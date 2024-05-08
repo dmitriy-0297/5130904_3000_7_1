@@ -51,6 +51,11 @@
                 else if (cmd == "MIN") {
                     min(polygons);
                 }
+                else if (cmd == "COUNT") {
+                    std::string param;
+                    iss >> param;
+                    count(polygons, param);
+                }
                 else {
                     throw INVALID_COMMAND;
                 }
@@ -87,6 +92,25 @@
                 auto minArea = std::min_element(polygons.begin(), polygons.end(),
                     [](const Polygon& p1, const Polygon& p2) { return p1.area() < p2.area(); });
                 std::cout << std::fixed << minArea->area() << "\n";
+            }
+
+            static void count(const std::vector<Polygon>& polygons, const std::string& param) {
+                if (param == "EVEN") {
+                    int count = std::count_if(polygons.begin(), polygons.end(),
+                        [](const Polygon& p) { return p.points.size() % 2 == 0; });
+                    std::cout << count << "\n";
+                }
+                else if (param == "ODD") {
+                    int count = std::count_if(polygons.begin(), polygons.end(),
+                        [](const Polygon& p) { return p.points.size() % 2 != 0; });
+                    std::cout << count << "\n";
+                }
+                else {
+                    int divisor = std::stoi(param);
+                    int count = std::count_if(polygons.begin(), polygons.end(),
+                        [divisor](const Polygon& p) { return p.points.size() == divisor; });
+                    std::cout << count << "\n";
+                }
             }
         };
 
