@@ -34,7 +34,7 @@ std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
           break;
         }
       }
-      if (polygon.points.size() == numVertices) {
+      if (polygon.points.size() == static_cast<std::vector<Point>::size_type>(numVertices)) {
         polygons.push_back(polygon);
       }
     }
