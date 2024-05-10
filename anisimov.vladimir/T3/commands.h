@@ -1,4 +1,4 @@
-#ifndef COMMANDS_H
+﻿#ifndef COMMANDS_H
 #define COMMANDS_H
 #include "geometry.h"
 

@@ -1,4 +1,4 @@
-﻿#include "geometry.h"
+#include "geometry.h"
 #include "commands.h"
 #include <iostream>
 
