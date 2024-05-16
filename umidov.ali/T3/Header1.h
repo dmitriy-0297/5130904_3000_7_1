@@ -1,28 +1,20 @@
-        #ifndef GEOMETRY_H
-        #define GEOMETRY_H
+        #ifndef HEADER1_H
+        #define HEADER1_H
+
         #include <vector>
-        #include <cmath>
-        namespace Geometry {
+        #include "Header2.h"
 
-            struct Point {
-                int x, y;
-
-                Point(int x = 0, int y = 0) : x(x), y(y) {}
-            };
-
-            struct Polygon {
-                std::vector<Point> points;
-
-                double area() const {
-                    double area = 0.0;
-                    int n = points.size();
-                    for (int i = 0; i < n; i++) {
-                        int j = (i + 1) % n;
-                        area += points[i].x * points[j].y;
-                        area -= points[j].x * points[i].y;
-                    }
-                    return std::abs(area / 2.0);
-                }
-            };
+        namespace cmd
+        {
+            int validStringToInt(std::string str);
+            void area(std::vector<geometry::Polygon>& value, const std::string str);
+            void max(std::vector<geometry::Polygon>& value, const std::string str);
+            void min(std::vector<geometry::Polygon>& value, const std::string str);
+            void count(std::vector<geometry::Polygon>& value, const std::string str);
+            void lessArea(std::vector<geometry::Polygon>& value);
+            void maxSeq(std::vector<geometry::Polygon>& value);
+            void echo(std::vector<geometry::Polygon>& value);
+            void inFrame(std::vector<geometry::Polygon>& value);
         }
+
         #endif
