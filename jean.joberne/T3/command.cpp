@@ -24,7 +24,7 @@ namespace cmd {
         }
 
         if (remains == -1) {
-            result = std::accumulate(polygons.begin(), polygons.end(), 0.0, 
+            result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [=](double acc, const jean::Polygon &p) { return acc + p.area(); });
             if (param == "MEAN" && !polygons.empty()) result /= polygons.size();
         } else {
@@ -40,7 +40,7 @@ namespace cmd {
     void max(const std::vector<jean::Polygon> &polygons, const std::string &param) {
         if (polygons.empty()) throw I_C;
         if (param == "AREA") {
-            auto maxArea = std::max_element(polygons.begin(), polygons.end(), 
+            auto maxArea = std::max_element(polygons.begin(), polygons.end(),
                 [](const jean::Polygon &a, const jean::Polygon &b) { return a.area() < b.area(); });
             std::cout << std::fixed << std::setprecision(1) << maxArea->area() << "\n";
         } else if (param == "VERTEXES") {
@@ -108,4 +108,3 @@ namespace cmd {
         std::cout << maxCount << "\n";
     }
 }
-
