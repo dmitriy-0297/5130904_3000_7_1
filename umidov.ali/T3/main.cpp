@@ -31,9 +31,10 @@
                 polygons.push_back(poly);
             }
 
-            Command::area(polygons);
-            Command::maxArea(polygons);
-            Command::minArea(polygons);
+            std::string command;
+            while (std::getline(std::cin, command)) {
+                Command::processCommand(command, polygons);
+            }
 
             return EXIT_SUCCESS;
         }

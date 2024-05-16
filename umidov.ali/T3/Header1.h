@@ -1,9 +1,7 @@
         #ifndef GEOMETRY_H
         #define GEOMETRY_H
-
         #include <vector>
         #include <cmath>
-
         namespace Geometry {
 
             struct Point {
@@ -26,7 +24,5 @@
                     return std::abs(area / 2.0);
                 }
             };
-
         }
-
         #endif
