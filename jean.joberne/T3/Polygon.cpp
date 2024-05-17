@@ -1,12 +1,11 @@
 #include "Polygon.h"
 #include <cmath>
-#include <numeric>
-#include <iomanip>
+#include <algorithm>
 
 namespace jean {
     double Polygon::area() const {
         double accum = 0.0;
-        for (size_t i = 0; i < points.size(); i++) {
+        for (size_t i = 0; i < points.size(); ++i) {
             const auto &current = points[i];
             const auto &next = points[(i + 1) % points.size()];
             accum += (current.x_ * next.y_ - next.x_ * current.y_);
@@ -15,26 +14,29 @@ namespace jean {
     }
 
     bool Polygon::operator==(const Polygon &other) const {
-        return points.size() == other.points.size() && std::equal(points.begin(), points.end(), other.points.begin());
+        return points == other.points;
     }
 
     std::istream& operator>>(std::istream &in, Polygon &polygon) {
-        int numPoints;
-        if (in >> numPoints && numPoints >= 3) {
-            polygon.points.resize(numPoints);
-            for (auto &point : polygon.points) {
-                in >> point;
+        int size;
+        if (in >> size && size >= 3) {
+            polygon.points.resize(size);
+            for (int i = 0; i < size; ++i) {
+                if (!(in >> polygon.points[i])) {
+                    in.setstate(std::ios::failbit);
+                    break;
+                }
             }
         } else {
-            in.setstate(std::ios_base::failbit);
+            in.setstate(std::ios::failbit);
         }
         return in;
     }
 
     std::ostream& operator<<(std::ostream &out, const Polygon &polygon) {
-        out << polygon.points.size() << " ";
+        out << polygon.points.size();
         for (const auto &point : polygon.points) {
-            out << point << " ";
+            out << ' ' << point;
         }
         return out;
     }

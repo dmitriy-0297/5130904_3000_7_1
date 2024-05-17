@@ -1,7 +1,6 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include <iostream>
 #include <vector>
 #include "Point.h"
 
@@ -10,7 +9,6 @@ namespace jean {
         std::vector<Point> points;
 
         double area() const;
-
         bool operator==(const Polygon &other) const;
     };
 

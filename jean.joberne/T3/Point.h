@@ -9,6 +9,7 @@ namespace jean {
 
         Point(int x = 0, int y = 0) : x_(x), y_(y) {}
 
+        bool operator==(const Point &other) const;  // Declaration of operator==
         bool operator!=(const Point &other) const;
     };
 
