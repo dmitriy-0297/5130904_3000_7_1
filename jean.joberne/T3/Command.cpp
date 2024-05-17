@@ -7,6 +7,8 @@
 #include <iomanip>
 
 namespace cmd {
+    const std::string I_C = "<INVALID COMMAND>";
+
     int validStringToInt(const std::string &str) {
         char *end;
         int num = std::strtol(str.c_str(), &end, 10);
@@ -25,7 +27,7 @@ namespace cmd {
 
         if (remains == -1) {
             if (polygons.empty()) {
-                std::cout << "0.0\n";
+                std::cout << "<INVALID COMMAND>\n";
                 return;
             }
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0,

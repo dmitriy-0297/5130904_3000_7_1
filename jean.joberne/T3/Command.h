@@ -2,19 +2,16 @@
 #define COMMAND_H
 
 #include <vector>
-#include <string>
 #include "Polygon.h"
 
 namespace cmd {
-    const std::string I_C = "<INVALID COMMAND>";
-
     int validStringToInt(const std::string &str);
-    void area(const std::vector<jean::Polygon> &polygons, const std::string &param);
-    void max(const std::vector<jean::Polygon> &polygons, const std::string &param);
-    void min(const std::vector<jean::Polygon> &polygons, const std::string &param);
-    void count(const std::vector<jean::Polygon> &polygons, const std::string &param);
-    void lessArea(const std::vector<jean::Polygon> &polygons);
-    void maxSeq(const std::vector<jean::Polygon> &polygons);
+    void area(const std::vector<jean::Polygon> &value, const std::string &str);
+    void max(const std::vector<jean::Polygon> &value, const std::string &str);
+    void min(const std::vector<jean::Polygon> &value, const std::string &str);
+    void count(const std::vector<jean::Polygon> &value, const std::string &str);
+    void lessArea(const std::vector<jean::Polygon> &value);
+    void maxSeq(const std::vector<jean::Polygon> &value);
 }
 
 #endif // COMMAND_H
