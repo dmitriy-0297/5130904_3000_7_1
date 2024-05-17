@@ -1,22 +1,22 @@
-#ifndef POLYGON_H
-#define POLYGON_H
-
-#include <iostream>
-#include <vector>
 #include "Point.h"
 
 namespace jean {
-    struct Polygon {
-        std::vector<Point> points;
+    bool Point::operator!=(const Point &other) const {
+        return x_ != other.x_ || y_ != other.y_;
+    }
 
-        double area() const;
+    std::istream& operator>>(std::istream &in, Point &point) {
+        char ch;
+        if (in >> ch && ch == '(' && in >> point.x_ && in >> ch && ch == ';' && in >> point.y_ && in >> ch && ch == ')') {
+            return in;
+        }
+        in.setstate(std::ios_base::failbit);
+        return in;
+    }
 
-        bool operator==(const Polygon &other) const;
-    };
-
-    std::istream& operator>>(std::istream &in, Polygon &polygon);
-    std::ostream& operator<<(std::ostream &out, const Polygon &polygon);
+    std::ostream& operator<<(std::ostream &out, const Point &point) {
+        out << "(" << point.x_ << ";" << point.y_ << ")";
+        return out;
+    }
 }
-
-#endif // POLYGON_H
 
