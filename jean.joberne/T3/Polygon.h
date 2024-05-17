@@ -18,7 +18,7 @@ namespace jean {
             }
             return std::abs(accum * 0.5);
         }
-        
+
         bool operator==(const Polygon &other) const {
             if (points.size() != other.points.size()) return false;
             for (size_t i = 0; i < points.size(); ++i) {
@@ -26,7 +26,7 @@ namespace jean {
             }
             return true;
         }
-        
+
         friend std::istream& operator>>(std::istream &in, Polygon &polygon);
         friend std::ostream& operator<<(std::ostream &out, const Polygon &polygon);
     };
@@ -44,7 +44,7 @@ namespace jean {
         }
         return in;
     }
-    
+
     std::ostream& operator<<(std::ostream &out, const Polygon &polygon) {
         out << polygon.points.size() << " ";
         for (const auto &point : polygon.points) {
