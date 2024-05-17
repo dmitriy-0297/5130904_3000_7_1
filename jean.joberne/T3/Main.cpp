@@ -3,6 +3,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <sstream> // Include this header for std::istringstream
 #include "Command.h"
 #include "Polygon.h"
 
@@ -14,23 +15,25 @@ int main(int argc, char* argv[]) {
         std::cout << "Usage: program_name <filename>\n";
         return EXIT_FAILURE;
     }
+    
     std::string fileName = argv[1];
     std::ifstream file(fileName);
     if (!file) {
         std::cerr << "Error: file didn't open\n";
         return EXIT_FAILURE;
     }
-
+    
     std::vector<jean::Polygon> value;
     std::copy(std::istream_iterator<jean::Polygon>(file), std::istream_iterator<jean::Polygon>(), std::back_inserter(value));
-
+    
     try {
         for(;;) {
             std::string str;
             if (!(std::getline(std::cin, str) && !str.empty() && !std::cin.eof())) {
                 break;
             }
-            std::istringstream iss(str);
+            
+            std::istringstream iss(str); // Correctly using std::istringstream
             std::string comnd1, comnd2;
             iss >> comnd1 >> comnd2;
 
