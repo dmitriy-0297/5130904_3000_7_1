@@ -30,7 +30,7 @@ namespace cmd {
         } else {
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [=](double acc, const jean::Polygon &p) {
-                    return acc + ((p.points.size() % divisor == remains) ? p.area() : 0);
+                    return acc + ((static_cast<int>(p.points.size()) % divisor == remains) ? p.area() : 0);
                 });
         }
 
@@ -76,7 +76,7 @@ namespace cmd {
         }
 
         auto count = std::count_if(polygons.begin(), polygons.end(),
-            [=](const jean::Polygon &p) { return p.points.size() % divisor == remains; });
+            [=](const jean::Polygon &p) { return static_cast<int>(p.points.size()) % divisor == remains; });
         std::cout << count << "\n";
     }
 
@@ -98,13 +98,12 @@ namespace cmd {
         int maxCount = 0, currentCount = 0;
         for (const auto &p : polygons) {
             if (p == refPolygon) {
-                ++currentCount;
-            } else {
+                currentCount++;
                 maxCount = std::max(maxCount, currentCount);
+            } else {
                 currentCount = 0;
             }
         }
-        maxCount = std::max(maxCount, currentCount);
         std::cout << maxCount << "\n";
     }
 }
