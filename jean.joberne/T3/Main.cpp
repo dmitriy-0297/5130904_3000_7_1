@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
         std::cout << "Usage: program_name <filename>\n";
         return EXIT_FAILURE;
     }
-    
     std::string fileName = argv[1];
     std::ifstream file(fileName);
     if (!file) {

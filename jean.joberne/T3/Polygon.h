@@ -9,8 +9,7 @@
 namespace jean {
     struct Polygon {
         std::vector<Point> points;
-        
-        double area() const {
+         double area() const {
             double accum = 0.0;
             for (size_t i = 0; i < points.size(); ++i) {
                 const auto &current = points[i];
