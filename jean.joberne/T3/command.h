@@ -18,3 +18,4 @@ namespace cmd {
 }
 
 #endif // COMMAND_H
+

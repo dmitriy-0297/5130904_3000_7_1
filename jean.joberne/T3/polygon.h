@@ -19,3 +19,4 @@ namespace jean {
 }
 
 #endif // POLYGON_H
+

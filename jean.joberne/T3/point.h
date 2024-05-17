@@ -17,3 +17,4 @@ namespace jean {
 }
 
 #endif // POINT_H
+
