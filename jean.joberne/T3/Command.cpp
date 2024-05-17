@@ -24,6 +24,10 @@ namespace cmd {
         }
 
         if (remains == -1) {
+            if (polygons.empty()) {
+                std::cout << I_C << "\n";
+                return;
+            }
             result = std::accumulate(polygons.begin(), polygons.end(), 0.0,
                 [=](double acc, const jean::Polygon &p) { return acc + p.area(); });
             if (param == "MEAN" && !polygons.empty()) result /= polygons.size();
