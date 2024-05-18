@@ -262,7 +262,7 @@ void functors::same(std::vector<Polygon>& polygons)
 void functors::echo()
 {
     std::string input;
-    std::cin >> input;
+    std::getline(std::cin, input);
     std::cout << "ECHO: " << input << std::endl;
 }
 
