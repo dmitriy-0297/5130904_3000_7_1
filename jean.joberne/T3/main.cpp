@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
             }
             else if (command == "ECHO")
             {
-                echo();
+                echo(vector);
             }
             else if (command == "RIGHTSHAPES")
             {
@@ -76,12 +76,12 @@ int main(int argc, char* argv[])
             }
             else if (command != "")
             {
-                throw "<INVALID COMMAND>";
+                throw std::runtime_error("<INVALID COMMAND>");
             }
         }
-        catch (const char* error)
+        catch (const std::exception& e)
         {
-            std::cout << error << std::endl;
+            std::cout << e.what() << std::endl;
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }

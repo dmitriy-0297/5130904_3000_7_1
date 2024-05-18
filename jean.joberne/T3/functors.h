@@ -1,7 +1,13 @@
 #ifndef FUNCTORS_H
 #define FUNCTORS_H
 
-#include "local.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <numeric>
+#include <algorithm>
+#include <functional>
+#include <stdexcept>
 #include "geometry.h"
 
 namespace functors
@@ -13,7 +19,7 @@ namespace functors
     void getQuantity(const std::vector<jean::Polygon>& polygons);
     void lessArea(std::vector<jean::Polygon>& polygons);
     void same(std::vector<jean::Polygon>& polygons);
-    void echo();
+    void echo(std::vector<jean::Polygon>& polygons);
     void rightShapes(const std::vector<jean::Polygon>& polygons);
 }
 

@@ -61,7 +61,7 @@ void functors::getTotalArea(const std::vector<Polygon>& polygons)
         }
         else
         {
-            throw "<INVALID COMMAND>";
+            throw std::runtime_error("<INVALID COMMAND>");
         }
     }
     else if (number > 2)
@@ -71,7 +71,7 @@ void functors::getTotalArea(const std::vector<Polygon>& polygons)
     }
     else
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 }
 
@@ -82,7 +82,7 @@ void functors::getMax(const std::vector<Polygon>& polygons)
 
     if (polygons.size() == 0)
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     std::vector<size_t> vectorSize(polygons.size());
@@ -105,7 +105,7 @@ void functors::getMax(const std::vector<Polygon>& polygons)
     }
     else
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 }
 
@@ -116,7 +116,7 @@ void functors::getMin(const std::vector<Polygon>& polygons)
 
     if (polygons.size() == 0)
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     std::vector<size_t> vectorSize(polygons.size());
@@ -140,7 +140,7 @@ void functors::getMin(const std::vector<Polygon>& polygons)
     }
     else
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 }
 
@@ -175,7 +175,7 @@ void functors::getQuantity(const std::vector<Polygon>& polygons)
         }
         else
         {
-            throw "<INVALID COMMAND>";
+            throw std::runtime_error("<INVALID COMMAND>");
         }
     }
     else if (number > 2)
@@ -185,7 +185,7 @@ void functors::getQuantity(const std::vector<Polygon>& polygons)
     }
     else
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 }
 
@@ -193,7 +193,7 @@ void functors::lessArea(std::vector<Polygon>& polygons)
 {
     if (polygons.empty())
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     Polygon basic;
@@ -202,12 +202,12 @@ void functors::lessArea(std::vector<Polygon>& polygons)
     auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin), std::istream_iterator<char>(), isspace);
     if (*firstNonWhitespace == std::iostream::traits_type::eof() or *firstNonWhitespace == int('n'))
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
     if (!isspace(*firstNonWhitespace))
     {
         std::cin.setstate(std::ios_base::failbit);
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     auto comparison = [&](const Polygon polygon)
@@ -223,7 +223,7 @@ void functors::same(std::vector<Polygon>& polygons)
 {
     if (polygons.empty())
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     Polygon basic;
@@ -232,12 +232,12 @@ void functors::same(std::vector<Polygon>& polygons)
     auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin), std::istream_iterator<char>(), isspace);
     if (*firstNonWhitespace == std::iostream::traits_type::eof() or *firstNonWhitespace == int('n'))
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
     if (!isspace(*firstNonWhitespace))
     {
         std::cin.setstate(std::ios_base::failbit);
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     int count = 0;
@@ -259,14 +259,26 @@ void functors::same(std::vector<Polygon>& polygons)
     std::cout << count << "\n";
 }
 
-void functors::echo()
+void functors::echo(std::vector<Polygon>& polygons)
 {
-    std::string input;
-    std::getline(std::cin, input);
-    // Trim leading and trailing whitespace
-    input.erase(input.begin(), std::find_if(input.begin(), input.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    input.erase(std::find_if(input.rbegin(), input.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), input.end());
-    std::cout << "ECHO " << input << std::endl;
+    Polygon poly;
+    std::cin >> poly;
+    if (std::cin.fail() || std::cin.get() != '\n')
+        throw std::runtime_error("<INVALID COMMAND>");
+
+    std::vector<Polygon> result;
+    int count = 0;
+    for (const Polygon& el : polygons)
+    {
+        result.push_back(el);
+        if (el == poly)
+        {
+            ++count;
+            result.push_back(el);
+        }
+    }
+    polygons = std::move(result);
+    std::cout << count << '\n';
 }
 
 void functors::rightShapes(const std::vector<Polygon>& polygons)
@@ -276,7 +288,7 @@ void functors::rightShapes(const std::vector<Polygon>& polygons)
     double threshold = convertToInt(input);
     if (threshold <= 0)
     {
-        throw "<INVALID COMMAND>";
+        throw std::runtime_error("<INVALID COMMAND>");
     }
 
     auto count = [threshold](const Polygon& polygon)

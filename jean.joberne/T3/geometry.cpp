@@ -1,144 +1,54 @@
 #include "geometry.h"
 
-double jean::Point::getDistance(const Point& point) const
+double jean::getDistance(const Point& p1, const Point& p2)
 {
-    double distance = 0;
-    distance = sqrt((x - point.x) * (x - point.x) + (y - point.y) * (y - point.y));
-    return distance;
-}
-
-bool jean::Point::operator !=(const Point& other) const
-{
-    return x != other.x or y != other.y;
-}
-
-double jean::getTrigonArea(const Point& point1, const Point& point2, const Point& point3)
-{
-    double firstSide = point1.getDistance(point2);
-    double secondSide = point2.getDistance(point3);
-    double thirdSide = point1.getDistance(point3);
-    double halfPerimeter = (firstSide + secondSide + thirdSide) / 2;
-    double trigonArea = 0;
-    trigonArea = sqrt(halfPerimeter * (halfPerimeter - firstSide) * (halfPerimeter - secondSide) * (halfPerimeter - thirdSide));
-    return trigonArea;
-}
-
-bool jean::Polygon::operator <(const Polygon& other) const
-{
-    return getArea() < other.getArea();
-}
-
-bool jean::Polygon::operator ==(const Polygon& other) const
-{
-    if (points.size() != other.points.size())
-    {
-        return false;
-    }
-    for (size_t i = 0; i < points.size(); i++)
-    {
-        if (points[i] != other.points[i])
-        {
-            return false;
-        }
-    }
-    return true;
+    int dx = p1.x - p2.x;
+    int dy = p1.y - p2.y;
+    return std::sqrt(dx * dx + dy * dy);
 }
 
 double jean::Polygon::getArea() const
 {
-    const Point pointFirst = points[0];
-    Point prev = points[1];
-    return std::accumulate(points.begin() + 2, points.end(), 0.0, [&pointFirst, &prev](double accumulatedArea, const Point& current)
+    const Point& fixed = points[0];
+    Point first = points[1];
+
+    double square = std::accumulate(points.begin() + 2, points.end(), 0.0,
+        [&fixed, &first](double accumulator, const Point& second)
         {
-            double trigonArea = getTrigonArea(pointFirst, prev, current);
-            accumulatedArea += trigonArea;
-            prev = current;
-            return accumulatedArea;
-        }
-    );
+            double a = getDistance(fixed, first);
+            double b = getDistance(first, second);
+            double c = getDistance(second, fixed);
+            double s = (a + b + c) / 2;
+            accumulator += std::sqrt(s * (s - a) * (s - b) * (s - c));
+            first = second;
+            return accumulator;
+        });
+
+    return square;
 }
 
-std::istream& jean::operator>>(std::istream& in, jean::DelimiterIO&& dest)
+bool jean::Polygon::operator<(const Polygon& other) const
 {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-    char null = '0';
-    in >> null;
-    if (in && (null != dest.exp))
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
+    return getArea() < other.getArea();
 }
 
-std::istream& jean::operator>>(std::istream& in, jean::Point& point)
+bool jean::Polygon::operator==(const Polygon& other) const
 {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    in >> jean::DelimiterIO{ '(' } >> point.x >> jean::DelimiterIO{ ';' } >> point.y >> jean::DelimiterIO{ ')' };
-    return in;
+    return points == other.points;
 }
 
-std::istream& jean::operator>>(std::istream& in, jean::Polygon& polygon)
+bool jean::Polygon::operator!=(const Polygon& other) const
 {
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    size_t amountPoints;
-    in >> amountPoints;
-    if (amountPoints < 3)
-    {
-        in.setstate(std::istream::failbit);
-        return in;
-    }
-
-    polygon.points.clear();
-    polygon.points.resize(amountPoints);
-
-    for (jean::Point& point : polygon.points)
-    {
-        in >> point;
-    }
-
-    return in;
+    return !(*this == other);
 }
 
-std::ostream& jean::operator<<(std::ostream& out, const jean::Point& point)
+bool jean::Point::operator==(const Point& other) const
 {
-    std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
-        return out;
-    }
-    out << "(" << point.x << ";" << point.y << ")";
-    return out;
+    return x == other.x && y == other.y;
 }
 
-std::ostream& jean::operator<<(std::ostream& out, const jean::Polygon& polygon)
+bool jean::Point::operator!=(const Point& other) const
 {
-    std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
-        return out;
-    }
-
-    out << polygon.points.size() << " ";
-
-    for (const jean::Point& point : polygon.points)
-    {
-        out << point << " ";
-    }
-
-    return out;
+    return !(*this == other);
 }
 
