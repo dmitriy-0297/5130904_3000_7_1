@@ -13,7 +13,6 @@
 
 using namespace jean;
 using namespace std::placeholders;
-
 // Function to get the total area of polygons based on criteria
 void functors::getTotalArea(const std::vector<jean::Polygon>& data)
 {
@@ -53,7 +52,6 @@ void functors::getTotalArea(const std::vector<jean::Polygon>& data)
         throw std::runtime_error("<INVALID COMMAND>");
     }
 }
-
 // Function to get the minimum area or vertex count of polygons
 void functors::getMin(const std::vector<jean::Polygon>& data)
 {
@@ -80,7 +78,6 @@ void functors::getMin(const std::vector<jean::Polygon>& data)
         throw std::runtime_error("<INVALID COMMAND>");
     }
 }
-
 // Function to get the maximum area or vertex count of polygons
 void functors::getMax(const std::vector<jean::Polygon>& data)
 {
