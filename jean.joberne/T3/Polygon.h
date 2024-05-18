@@ -10,6 +10,8 @@ namespace jean {
     struct Polygon {
         std::vector<Point> points;
 
+        Polygon() = default;
+
         double area() const {
             double accum = 0.0;
             for (size_t i = 0; i < points.size(); ++i) {

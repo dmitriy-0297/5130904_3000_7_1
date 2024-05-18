@@ -5,7 +5,7 @@ namespace jean {
         int tSize;
         in >> tSize;
         if (tSize >= 3) {
-            polygon.points.resize(tSize);
+            polygon.points.resize(tSize, Point(0, 0)); // Ensure points are initialized
             for (int i = 0; i < tSize; ++i) {
                 in >> polygon.points[i];
             }

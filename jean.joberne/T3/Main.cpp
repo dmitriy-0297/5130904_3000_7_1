@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            std::istringstream iss(str); // Correctly using std::istringstream
+            std::istringstream iss(str);
             std::string comnd1, comnd2;
             iss >> comnd1 >> comnd2;
 
