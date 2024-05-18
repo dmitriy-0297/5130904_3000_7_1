@@ -263,6 +263,9 @@ void functors::echo()
 {
     std::string input;
     std::getline(std::cin, input);
+    // Trim leading and trailing whitespace
+    input.erase(input.begin(), std::find_if(input.begin(), input.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    input.erase(std::find_if(input.rbegin(), input.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), input.end());
     std::cout << "ECHO " << input << std::endl;
 }
 
