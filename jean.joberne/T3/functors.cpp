@@ -263,7 +263,7 @@ void functors::echo()
 {
     std::string input;
     std::getline(std::cin, input);
-    std::cout << "ECHO" << input << std::endl;
+    std::cout << "ECHO " << input << std::endl;
 }
 
 void functors::rightShapes(const std::vector<Polygon>& polygons)
