@@ -186,9 +186,8 @@ void deleske::maxSeq(std::vector<Polygon> &value)
       {
         maxCount = std::max(maxCount, currentCount);
         currentCount = 0;
-        return false;
       }
-      return true;
+      return false;
     };
   currentCount = std::count_if(value.begin(), value.end(), counter);
   maxCount = std::max(maxCount, currentCount);
