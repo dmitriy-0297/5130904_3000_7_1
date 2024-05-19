@@ -2,7 +2,7 @@
 #include "Header2.h"
 #include "set.h"
 const std::string I_C = "<INVALID COMMAND>";
-const std::string I_CMD = "< Unknown command entered >";
+const std::string I_CMD = "< Unknown command >";
 
 int cmd::validStringToInt(std::string str)
 {
