@@ -2,7 +2,6 @@
 #include "Header2.h"
 #include "set.h"
 const std::string I_C = "<INVALID COMMAND>";
-const std::string I_CMD = "< Unknown command >";
 
 int cmd::validStringToInt(std::string str)
 {
@@ -454,7 +453,7 @@ int main(int argc, char* argv[])
                 }
                 else if (comnd1 != "")
                 {
-                    throw I_CMD;
+                    throw I_C;
                 }
             }
             catch (const std::string k)
