@@ -164,36 +164,17 @@ void deleske::maxSeq(std::vector<Polygon> &value)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-
-  Polygon mainEl;
-  std::cin >> mainEl;
-  int prov = std::cin.get();
-  for (;;)
-  {
-    if (prov == int('\n') || prov == std::iostream::traits_type::eof())
-    {
-      break;
-    }
-    if (!isspace(prov))
-    {
-      std::cin.setstate(std::ios_base::failbit);
-      break;
-    }
-    prov = std::cin.get();
-  }
-
-  if (std::cin.fail())
-  {
-    std::cin.clear();
+  deleske::Polygon poly;
+  std::cin >> poly;
+  if (std::cin.fail() || std::cin.get() != '\n')
     throw std::runtime_error("<INVALID COMMAND>");
-  }
 
   int maxCount = 0;
   int currentCount = 0;
 
   auto counter = [&](const Polygon tPolygon)
     {
-      if (mainEl == tPolygon)
+      if (poly == tPolygon)
       {
         currentCount++;
       }
