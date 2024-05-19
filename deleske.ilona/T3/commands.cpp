@@ -137,6 +137,10 @@ void deleske::count(const std::vector<Polygon> &data)
 
 void deleske::echo(std::vector<Polygon> &data)
 {
+  if (data.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
   deleske::Polygon poly;
   std::cin >> poly;
   if (std::cin.fail() || std::cin.get() != '\n')
@@ -172,7 +176,7 @@ void deleske::maxSeq(std::vector<Polygon> &value)
   int maxCount = 0;
   int currentCount = 0;
 
-  auto counter = [&](const Polygon tPolygon)
+  auto counter = [&](const Polygon &tPolygon)
     {
       if (poly == tPolygon)
       {

@@ -70,18 +70,20 @@ bool deleske::Polygon::operator<(const Polygon &other) const
   return getArea() < other.getArea();
 }
 
-bool deleske::Polygon::operator==(const Polygon &other) const
+bool deleske::Polygon::operator==(const Polygon &otherEl) const
 {
-  if (points.size() == other.points.size())
+  if (points.size() != otherEl.points.size())
   {
-    for (std::size_t i = 0; i < points.size(); ++i)
-    {
-      if (points[i] != other.points[i])
-        return false;
-    }
-    return true;
+    return false;
   }
-  return false;
+  for (size_t i = 0; i < this->points.size(); i++)
+  {
+    if (points[i] != otherEl.points[i])
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool deleske::Polygon::operator!=(const Polygon &other) const
