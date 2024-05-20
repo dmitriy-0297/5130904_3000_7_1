@@ -1,5 +1,4 @@
 #include "methods.h"
-#include "Polygon.h"
 
 using namespace anisimov;
 using namespace std::placeholders;
@@ -220,34 +219,45 @@ void methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void maxseq(std::vector<anisimov::Polygon>& polygons) {
-  if (polygons.empty()) {
-    throw "<INVALID COMMAND>";
+void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
+{
+  if (polygons.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
   }
 
   size_t maxCount = 1;
   size_t currentCount = 1;
-  size_t startIndex = 0;
-  size_t maxStartIndex = 0;
+  size_t index = 0;
 
-  for (size_t i = 1; i < polygons.size(); ++i) {
-    if (polygons[i] == polygons[i - 1]) {
+  for (size_t i = 1; i < polygons.size(); ++i)
+  {
+    if (polygons[i] == polygons[i - 1])
+    {
       currentCount++;
-      if (currentCount > maxCount) {
+      if (currentCount > maxCount)
+      {
         maxCount = currentCount;
-        maxStartIndex = startIndex;
+        index = i;
       }
     }
-    else {
+    else
+    {
       currentCount = 1;
-      startIndex = i;
     }
   }
 
-  if (maxCount == 1) {
-    std::cout << "1" << std::endl;
+  if (maxCount == 1)
+  {
+    std::cout << "MAXSEQ 0" << std::endl;
   }
-  else {
-    std::cout << maxCount << std::endl;
+  else
+  {
+    std::cout << "MAXSEQ ";
+    for (size_t i = index - maxCount + 1; i <= index; ++i)
+    {
+      std::cout << polygons[i] << " ";
+    }
+    std::cout << std::endl << maxCount << std::endl;
   }
 }
