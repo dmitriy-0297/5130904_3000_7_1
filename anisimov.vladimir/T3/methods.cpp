@@ -248,6 +248,11 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
       currentIndex = i;
     }
   }
+  if (currentCount > maxCount)
+  {
+    maxCount = currentCount;
+    maxIndex = currentIndex;
+  }
 
   if (maxCount == 1)
   {
