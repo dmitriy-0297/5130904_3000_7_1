@@ -223,13 +223,12 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 {
   if (polygons.empty())
   {
-    throw "<INVALID COMMAND>";
+    throw std::runtime_error("<INVALID COMMAND>");
   }
 
   size_t maxCount = 1;
   size_t currentCount = 1;
-  size_t maxIndex = 0;
-  size_t currentIndex = 0;
+  size_t index = 0;
 
   for (size_t i = 1; i < polygons.size(); ++i)
   {
@@ -239,19 +238,13 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
       if (currentCount > maxCount)
       {
         maxCount = currentCount;
-        maxIndex = currentIndex;
+        index = i;
       }
     }
     else
     {
       currentCount = 1;
-      currentIndex = i;
     }
-  }
-  if (currentCount > maxCount)
-  {
-    maxCount = currentCount;
-    maxIndex = currentIndex;
   }
 
   if (maxCount == 1)
@@ -261,8 +254,10 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
   else
   {
     std::cout << "MAXSEQ ";
-    std::copy(polygons.begin() + maxIndex - maxCount + 1, polygons.begin() + maxIndex + 1,
-      std::ostream_iterator<anisimov::Polygon>(std::cout, " "));
+    for (size_t i = index - maxCount + 1; i <= index; ++i)
+    {
+      std::cout << polygons[i] << " ";
+    }
     std::cout << std::endl << maxCount << std::endl;
   }
 }
