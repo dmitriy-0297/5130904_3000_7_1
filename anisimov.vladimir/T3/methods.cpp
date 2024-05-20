@@ -232,6 +232,7 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
   size_t currentCount = 1;
   size_t index = 0;
 
+  bool foundRepeatedSequence = false;
   while (next != polygons.end())
   {
     if (*current == *next)
@@ -242,25 +243,30 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
         maxCount = currentCount;
         index = next - polygons.begin();
       }
+      foundRepeatedSequence = true;
+      {
+        currentCount = 1;
+      }
+      current++;
+      next++;
+    }
+
+    if (!foundRepeatedSequence)
+    {
+      throw "<INVALID COMMAND>";
+    }
+
+    if (maxCount == 1)
+    {
+      std::cout << "MAXSEQ 0" << std::endl;
     }
     else
     {
-      currentCount = 1;
+      std::cout << "MAXSEQ ";
+      std::copy(polygons.begin() + index - maxCount + 1, polygons.begin() + index + 1,
+        std::ostream_iterator<anisimov::Polygon>(std::cout, " "));
+      std::cout << std::endl
+        << maxCount << std::endl;
     }
-    current++;
-    next++;
-  }
-
-  if (maxCount == 1)
-  {
-    std::cout << "MAXSEQ 0" << std::endl;
-  }
-  else
-  {
-    std::cout << "MAXSEQ ";
-    std::copy(polygons.begin() + index - maxCount + 1, polygons.begin() + index + 1,
-      std::ostream_iterator<anisimov::Polygon>(std::cout, " "));
-    std::cout << std::endl
-      << maxCount << std::endl;
   }
 }
