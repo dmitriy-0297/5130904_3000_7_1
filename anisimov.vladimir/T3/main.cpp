@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
       std::istream_iterator<Polygon>(),
       std::back_inserter(vector));
 
-    if (file.fail() and !file.eof())
+    if (file.fail() && !file.eof())
     {
       file.clear();
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
