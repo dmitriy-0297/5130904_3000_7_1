@@ -228,7 +228,8 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 
   size_t maxCount = 1;
   size_t currentCount = 1;
-  size_t index = 0;
+  size_t maxIndex = 0;
+  size_t currentIndex = 0;
 
   for (size_t i = 1; i < polygons.size(); ++i)
   {
@@ -238,12 +239,13 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
       if (currentCount > maxCount)
       {
         maxCount = currentCount;
-        index = i;
+        maxIndex = currentIndex;
       }
     }
     else
     {
       currentCount = 1;
+      currentIndex = i;
     }
   }
 
@@ -254,9 +256,8 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
   else
   {
     std::cout << "MAXSEQ ";
-    std::copy(polygons.begin() + index - maxCount + 1, polygons.begin() + index + 1,
+    std::copy(polygons.begin() + maxIndex - maxCount + 1, polygons.begin() + maxIndex + 1,
       std::ostream_iterator<anisimov::Polygon>(std::cout, " "));
     std::cout << std::endl << maxCount << std::endl;
   }
 }
-
