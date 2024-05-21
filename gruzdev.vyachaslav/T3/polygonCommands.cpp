@@ -201,8 +201,8 @@ bool isRightAngledTriangle(const Point& point1, const Point& point2, const Point
   double b = getDistance(point2, point3);
   double c = getDistance(point1, point3);
 
-  return (isEqualDouble(pow(c, 2), pow(a, 2) + pow(b, 2)), 
-    isEqualDouble(pow(a, 2), pow(b, 2) + pow(c, 2)), 
+  return (isEqualDouble(pow(c, 2), pow(a, 2) + pow(b, 2)),
+    isEqualDouble(pow(a, 2), pow(b, 2) + pow(c, 2)),
     isEqualDouble(pow(b, 2), pow(c, 2) + pow(a, 2)));
 }
 
