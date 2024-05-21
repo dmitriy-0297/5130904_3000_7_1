@@ -232,5 +232,5 @@ bool hasRightAngle(const Polygon& polygon)
 
 void rightShapes(std::vector< Polygon >& polygons)
 {
-  std::cout << std::count_if(polygons.begin(), polygons.end()) << std::endl;
+  std::cout << std::count_if(polygons.begin(), polygons.end(), hasRightAngle) << std::endl;
 }
