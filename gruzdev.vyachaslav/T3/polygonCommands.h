@@ -10,8 +10,6 @@
 
 void perms(std::vector< Polygon >& polygons);
 
-void rightShapes(std::vector< Polygon >& polygons);
-
 void area(std::vector< Polygon >& polygons);
 
 void max(std::vector< Polygon >& polygons);

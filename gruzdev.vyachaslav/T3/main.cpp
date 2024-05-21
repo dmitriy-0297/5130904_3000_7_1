@@ -54,10 +54,6 @@ int main(int nArguments, char** file)
       {
         perms(polygons);
       }
-      else if (command == "RIGHTSHAPES")
-      {
-        rightShapes(polygons);
-      }
       else if (command == "AREA")
       {
         area(polygons);
