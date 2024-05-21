@@ -1,4 +1,4 @@
-#include "Iofmtguard.h"
+#include "iofmtguard.h"
 
 Iofmtguard::Iofmtguard(std::basic_ios< char >& s) :
   s_(s),
