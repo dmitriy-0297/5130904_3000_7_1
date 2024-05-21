@@ -1,5 +1,6 @@
 #include <fstream>
 #include <map>
+#include <iostream>
 
 #include "polygonCommands.h"
 
