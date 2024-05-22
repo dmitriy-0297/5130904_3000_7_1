@@ -1,11 +1,9 @@
-#ifndef POLYGON_H
-#define POLYGON_H
+#ifndef SHAPES_H
+#define SHAPES_H
 
 #include <iostream>
+#include <string>
 #include <vector>
-#include <algorithm>
-#include <numeric>
-#include <cmath>
 
 struct Point {
   int x, y;
@@ -15,7 +13,7 @@ struct Point {
   }
 };
 
-struct Polygon {
+struct Shape {
   std::vector<Point> points;
 };
 
@@ -29,7 +27,7 @@ struct intIO {
 
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 std::istream& operator>>(std::istream& in, intIO&& dest);
-std::istream& operator>>(std::istream& in, Polygon& dest);
+std::istream& operator>>(std::istream& in, Shape& dest);
 
-#endif
+#endif // SHAPES_H
 

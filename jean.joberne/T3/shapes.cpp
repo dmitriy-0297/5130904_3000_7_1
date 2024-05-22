@@ -1,4 +1,4 @@
-#include "Polygon.h"
+#include "shapes.h"
 
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest) {
   std::istream::sentry sentry(in);
@@ -25,13 +25,13 @@ std::istream& operator>>(std::istream& in, intIO&& dest) {
   return in;
 }
 
-std::istream& operator>>(std::istream& in, Polygon& dest) {
+std::istream& operator>>(std::istream& in, Shape& dest) {
   std::istream::sentry sentry(in);
   if (!sentry) {
     return in;
   }
 
-  Polygon polygon;
+  Shape shape;
   size_t nPoints = 0;
   in >> nPoints;
   if (nPoints < 3) {
@@ -50,12 +50,12 @@ std::istream& operator>>(std::istream& in, Polygon& dest) {
     point.y = temp;
     in >> DelimiterIO{')'};
     if (in) {
-      polygon.points.push_back(point);
+      shape.points.push_back(point);
     }
   }
 
-  if (polygon.points.size() == nPoints) {
-    dest = polygon;
+  if (shape.points.size() == nPoints) {
+    dest = shape;
   } else {
     in.setstate(std::ios::failbit);
   }
