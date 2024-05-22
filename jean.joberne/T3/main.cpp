@@ -1,74 +1,112 @@
+#include <iostream>
 #include <fstream>
-#include <string>
 #include <vector>
 #include <iterator>
-#include <stdexcept>
-#include <algorithm>
-#include <iomanip>
+#include <limits>
+#include "Polygon.h"
 
-#include "geometry.h"
-#include "io.h"
-#include "functors.h"
+void area(const std::vector<Polygon>& polygons);
+void perms(const std::vector<Polygon>& polygons);
 
-int main(int argc, char *argv[])
-{
-    if (argc != 2)
-    {
-        std::cerr << "Error: Expected 1 command-line argument, but got " << argc - 1 << ".\n";
-        return EXIT_FAILURE;
+int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    return 1;
+  }
+
+  std::ifstream inputF(argv[1]);
+  if (!inputF) {
+    return 1;
+  }
+
+  std::vector<Polygon> polygons;
+  while (inputF) {
+    Polygon polygon;
+    inputF >> polygon;
+    if (inputF) {
+      polygons.push_back(polygon);
     }
-    std::string filename = argv[1];
-    std::ifstream file(filename);
-    if (!file)
-    {
-        std::cerr << "Error: file didn't open\n";
-        return EXIT_FAILURE;
+    if (inputF.fail() && !inputF.eof()) {
+      inputF.clear();
+      inputF.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
+  }
 
-    std::cout << std::setprecision(1) << std::fixed;
-    std::vector<jean::Polygon> vec;
-    std::copy(std::istream_iterator<jean::Polygon>(file),
-              std::istream_iterator<jean::Polygon>(),
-              std::back_inserter(vec));
-
-    if (!file.eof() && file.fail())
-    {
-        file.clear();
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  std::string command;
+  while (std::cin >> command) {
+    try {
+      if (command == "AREA") {
+        area(polygons);
+      } else if (command == "PERMS") {
+        perms(polygons);
+      } else {
+        throw std::invalid_argument("Invalid command");
+      }
+    } catch (...) {
+      std::cout << "<INVALID COMMAND>" << '\n';
     }
+  }
 
-    while (!std::cin.eof())
-    {
-        std::cin.clear();
-        std::string command;
-        std::cin >> command;
-        try
-        {
-            if (command == "AREA")
-                functors::getTotalArea(vec);
-            else if (command == "MIN")
-                functors::getMin(vec);
-            else if (command == "MAX")
-                functors::getMax(vec);
-            else if (command == "COUNT")
-                functors::getQuantity(vec);
-            else if (command == "LESSAREA")
-                functors::lessArea(vec);
-            else if (command == "SAME")
-                functors::same(vec);
-            else if (command == "ECHO")
-                functors::echo(vec);
-            else if (!std::cin.eof())
-            {
-                throw std::runtime_error("<INVALID COMMAND>");
-            }
-        }
-        catch (std::exception &ex)
-        {
-            std::cout << ex.what() << '\n';
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+  return 0;
+}
+
+void area(const std::vector<Polygon>& polygons) {
+  std::string mode;
+  std::cin >> mode;
+  std::cout << std::fixed << std::setprecision(1);
+
+  if (mode == "EVEN") {
+    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+      [](double area, const Polygon& polygon) {
+        return polygon.points.size() % 2 == 0 ? area + std::abs(std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, [](double acc, const Point& point) {
+          return acc + (point.x * point.y);
+        })) : area;
+      });
+    std::cout << totalArea << '\n';
+  } else if (mode == "ODD") {
+    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+      [](double area, const Polygon& polygon) {
+        return polygon.points.size() % 2 != 0 ? area + std::abs(std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, [](double acc, const Point& point) {
+          return acc + (point.x * point.y);
+        })) : area;
+      });
+    std::cout << totalArea << '\n';
+  } else if (mode == "MEAN") {
+    if (polygons.empty()) {
+      throw std::invalid_argument("No polygons available");
     }
+    double meanArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+      [](double area, const Polygon& polygon) {
+        return area + std::abs(std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, [](double acc, const Point& point) {
+          return acc + (point.x * point.y);
+        }));
+      }) / polygons.size();
+    std::cout << meanArea << '\n';
+  } else {
+    size_t size = std::stoull(mode);
+    if (size <= 2) {
+      throw std::invalid_argument("Invalid polygon size");
+    }
+    double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
+      [size](double area, const Polygon& polygon) {
+        return polygon.points.size() == size ? area + std::abs(std::accumulate(polygon.points.begin(), polygon.points.end(), 0.0, [](double acc, const Point& point) {
+          return acc + (point.x * point.y);
+        })) : area;
+      });
+    std::cout << totalArea << '\n';
+  }
+}
+
+void perms(const std::vector<Polygon>& polygons) {
+  Polygon local;
+  std::cin >> local;
+  if (!std::cin) {
+    throw std::invalid_argument("Invalid polygon input");
+  } else {
+    int count = std::count_if(polygons.begin(), polygons.end(),
+      [&local](const Polygon& polygon) {
+        return std::is_permutation(polygon.points.begin(), polygon.points.end(), local.points.begin());
+      });
+    std::cout << count << '\n';
+  }
 }
 
