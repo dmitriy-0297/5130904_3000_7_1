@@ -3,6 +3,7 @@
 #include <vector>
 #include <iterator>
 #include <limits>
+#include <iomanip>
 #include "Polygon.h"
 
 void area(const std::vector<Polygon>& polygons);
@@ -57,9 +58,9 @@ void area(const std::vector<Polygon>& polygons) {
   if (mode == "EVEN") {
     double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
       [](double area, const Polygon& polygon) {
-        return polygon.points.size() % 2 == 0
+        return polygon.points.size() % 2 == 0 
             ? area + std::abs(std::accumulate(
-                polygon.points.begin(), polygon.points.end(), 0.0,
+                polygon.points.begin(), polygon.points.end(), 0.0, 
                 [](double acc, const Point& point) {
                   return acc + (point.x * point.y);
                 }))
@@ -69,9 +70,9 @@ void area(const std::vector<Polygon>& polygons) {
   } else if (mode == "ODD") {
     double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
       [](double area, const Polygon& polygon) {
-        return polygon.points.size() % 2 != 0
+        return polygon.points.size() % 2 != 0 
             ? area + std::abs(std::accumulate(
-                polygon.points.begin(), polygon.points.end(), 0.0,
+                polygon.points.begin(), polygon.points.end(), 0.0, 
                 [](double acc, const Point& point) {
                   return acc + (point.x * point.y);
                 }))
@@ -85,7 +86,7 @@ void area(const std::vector<Polygon>& polygons) {
     double meanArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
       [](double area, const Polygon& polygon) {
         return area + std::abs(std::accumulate(
-            polygon.points.begin(), polygon.points.end(), 0.0,
+            polygon.points.begin(), polygon.points.end(), 0.0, 
             [](double acc, const Point& point) {
               return acc + (point.x * point.y);
             }));
@@ -98,9 +99,9 @@ void area(const std::vector<Polygon>& polygons) {
     }
     double totalArea = std::accumulate(polygons.begin(), polygons.end(), 0.0,
       [size](double area, const Polygon& polygon) {
-        return polygon.points.size() == size
+        return polygon.points.size() == size 
             ? area + std::abs(std::accumulate(
-                polygon.points.begin(), polygon.points.end(), 0.0,
+                polygon.points.begin(), polygon.points.end(), 0.0, 
                 [](double acc, const Point& point) {
                   return acc + (point.x * point.y);
                 }))
@@ -118,8 +119,8 @@ void perms(const std::vector<Polygon>& polygons) {
   } else {
     int count = std::count_if(polygons.begin(), polygons.end(),
       [&local](const Polygon& polygon) {
-        return std::is_permutation(polygon.points.begin(),
-                                   polygon.points.end(),
+        return std::is_permutation(polygon.points.begin(), 
+                                   polygon.points.end(), 
                                    local.points.begin());
       });
     std::cout << count << '\n';
