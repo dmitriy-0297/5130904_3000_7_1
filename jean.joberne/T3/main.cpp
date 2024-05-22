@@ -143,8 +143,8 @@ void perms(const std::vector<Polygon>& polygons) {
   } else {
     int count = std::count_if(polygons.begin(), polygons.end(),
       [&local](const Polygon& polygon) {
-        return std::is_permutation(polygon.points.begin(), 
-                                   polygon.points.end(), 
+        return std::is_permutation(polygon.points.begin(),
+                                   polygon.points.end(),
                                    local.points.begin());
       });
     std::cout << count << '\n';
