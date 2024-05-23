@@ -47,9 +47,16 @@ bool anisimov::Polygon::operator ==(const Polygon& other) const
 
 double anisimov::Polygon::getArea() const
 {
-  const Point pointFirst = points[0];
+  if (points.size() < 3)
+  {
+    return 0.0;
+  }
+
+  const Point& pointFirst = points[0];
   Point prev = points[1];
-  return std::accumulate(points.begin() + 2, points.end(), 0.0, [&pointFirst, &prev](double accumulatedArea, const Point& current)
+
+  return std::accumulate(points.begin() + 2, points.end(), 0.0,
+    [&pointFirst, &prev](double accumulatedArea, const Point& current)
     {
       double trigonArea = getTrigonArea(pointFirst, prev, current);
       accumulatedArea += trigonArea;

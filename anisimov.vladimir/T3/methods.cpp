@@ -223,7 +223,8 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 {
   if (polygons.empty())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    std::cout << "MAXSEQ 0" << std::endl;
+    return;
   }
 
   size_t maxCount = 1;
