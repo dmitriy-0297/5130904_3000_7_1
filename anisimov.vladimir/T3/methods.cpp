@@ -225,15 +225,17 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
+
   anisimov::Polygon poly;
   std::cin >> poly;
+
   if (std::cin.fail() || std::cin.get() != '\n')
     throw std::runtime_error("<INVALID COMMAND>");
 
   int maxCount = 0;
   int currentCount = 0;
 
-  auto counter = [&](const Polygon& tPolygon)
+  auto counter = [&](const anisimov::Polygon& tPolygon)
     {
       if (poly == tPolygon)
       {
@@ -246,6 +248,7 @@ void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
       }
       return false;
     };
+
   currentCount = std::count_if(polygons.begin(), polygons.end(), counter);
   maxCount = std::max(maxCount, currentCount);
   std::cout << maxCount << "\n";
