@@ -219,7 +219,7 @@ void methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void maxseq(std::vector<anisimov::Polygon>& value);
+void methods::maxseq(std::vector<anisimov::Polygon>& value)
 {
   if (value.empty())
   {
