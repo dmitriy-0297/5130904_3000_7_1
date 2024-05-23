@@ -219,29 +219,34 @@ void methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void methods::maxseq(std::vector<anisimov::Polygon>& value)
-std::string command;
-std::cin >> command;
-if (command != "MAXSEQ") {
-  throw std::runtime_error("<INVALID COMMAND>");
-}
-
-int targetVertexCount;
-std::cin >> targetVertexCount;
-
-int maxSequence = 0;
-int currentSequence = 0;
-
-for (const auto& polygon : polygons) {
-  if (polygon.points.size() == static_cast<size_t>(targetVertexCount)) {
-    currentSequence++;
+void anisimov::maxSeq(std::vector<Polygon>& value)
+{
+  if (value.empty())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
   }
-  else {
-    maxSequence = std::max(maxSequence, currentSequence);
-    currentSequence = 0;
-  }
-}
+  anisimov::Polygon poly;
+  std::cin >> poly;
+  if (std::cin.fail() || std::cin.get() != '\n')
+    throw std::runtime_error("<INVALID COMMAND>");
 
-maxSequence = std::max(maxSequence, currentSequence);
-std::cout << maxSequence << std::endl;
+  int maxCount = 0;
+  int currentCount = 0;
+
+  auto counter = [&](const Polygon& tPolygon)
+    {
+      if (poly == tPolygon)
+      {
+        currentCount++;
+      }
+      else
+      {
+        maxCount = std::max(maxCount, currentCount);
+        currentCount = 0;
+      }
+      return false;
+    };
+  currentCount = std::count_if(value.begin(), value.end(), counter);
+  maxCount = std::max(maxCount, currentCount);
+  std::cout << maxCount << "\n";
 }
