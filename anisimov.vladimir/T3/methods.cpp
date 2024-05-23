@@ -3,7 +3,7 @@
 using namespace anisimov;
 using namespace std::placeholders;
 
-int anisimov::methods::convertToInt(const std::string& str)
+int methods::convertToInt(const std::string& str)
 {
   try
   {
@@ -19,7 +19,7 @@ int anisimov::methods::convertToInt(const std::string& str)
   }
 }
 
-void anisimov::methods::getTotalArea(const std::vector<Polygon>& polygons)
+void methods::getTotalArea(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -75,7 +75,7 @@ void anisimov::methods::getTotalArea(const std::vector<Polygon>& polygons)
   }
 }
 
-void anisimov::methods::getMax(const std::vector<Polygon>& polygons)
+void methods::getMax(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -110,7 +110,7 @@ void anisimov::methods::getMax(const std::vector<Polygon>& polygons)
   }
 }
 
-void anisimov::methods::getMin(const std::vector<Polygon>& polygons)
+void methods::getMin(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -145,7 +145,7 @@ void anisimov::methods::getMin(const std::vector<Polygon>& polygons)
   }
 }
 
-void anisimov::methods::getQuantity(const std::vector<Polygon>& polygons)
+void methods::getQuantity(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -190,7 +190,7 @@ void anisimov::methods::getQuantity(const std::vector<Polygon>& polygons)
   }
 }
 
-void anisimov::methods::lessArea(std::vector<Polygon>& polygons)
+void methods::lessArea(std::vector<Polygon>& polygons)
 {
   if (polygons.empty())
   {
@@ -219,13 +219,8 @@ void anisimov::methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void anisimov::methods::maxseq(std::vector<anisimov::Polygon>& polygons)
+void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 {
-  if (polygons.empty())
-  {
-    throw std::runtime_error("<INVALID COMMAND>");
-  }
-
   anisimov::Polygon poly;
   std::cin >> poly;
 
