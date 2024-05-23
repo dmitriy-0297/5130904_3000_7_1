@@ -3,7 +3,7 @@
 using namespace anisimov;
 using namespace std::placeholders;
 
-int methods::convertToInt(const std::string& str)
+int anisimov::convertToInt(const std::string& str)
 {
   try
   {
@@ -19,7 +19,7 @@ int methods::convertToInt(const std::string& str)
   }
 }
 
-void methods::getTotalArea(const std::vector<Polygon>& polygons)
+void anisimov::getTotalArea(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -75,7 +75,7 @@ void methods::getTotalArea(const std::vector<Polygon>& polygons)
   }
 }
 
-void methods::getMax(const std::vector<Polygon>& polygons)
+void anisimov::getMax(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -110,7 +110,7 @@ void methods::getMax(const std::vector<Polygon>& polygons)
   }
 }
 
-void methods::getMin(const std::vector<Polygon>& polygons)
+void anisimov::getMin(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -145,7 +145,7 @@ void methods::getMin(const std::vector<Polygon>& polygons)
   }
 }
 
-void methods::getQuantity(const std::vector<Polygon>& polygons)
+void anisimov::getQuantity(const std::vector<Polygon>& polygons)
 {
   std::string string;
   std::cin >> string;
@@ -190,7 +190,7 @@ void methods::getQuantity(const std::vector<Polygon>& polygons)
   }
 }
 
-void methods::lessArea(std::vector<Polygon>& polygons)
+void anisimov::lessArea(std::vector<Polygon>& polygons)
 {
   if (polygons.empty())
   {
@@ -219,46 +219,40 @@ void methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
+void anisimov::maxSeq(std::vector<Polygon>& value)
 {
-  if (polygons.empty())
+  if (value.empty())
   {
-    std::cout << "MAXSEQ 0" << std::endl;
-    return;
+    throw std::runtime_error("<INVALID COMMAND>");
   }
 
-  size_t maxCount = 1;
-  size_t currentCount = 1;
-  size_t index = 0;
+  Polygon poly;
+  std::cin >> poly;
 
-  for (size_t i = 1; i < polygons.size(); ++i)
+  if (std::cin.fail() || std::cin.get() != '\n')
   {
-    if (polygons[i] == polygons[i - 1])
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+
+  int maxCount = 0;
+  int currentCount = 0;
+
+  auto counter = [&](const Polygon& tPolygon)
     {
-      currentCount++;
-      if (currentCount > maxCount)
+      if (poly == tPolygon)
       {
-        maxCount = currentCount;
-        index = i;
+        currentCount++;
       }
-    }
-    else
-    {
-      currentCount = 1;
-    }
-  }
+      else
+      {
+        maxCount = std::max(maxCount, currentCount);
+        currentCount = 0;
+      }
+      return false;
+    };
 
-  if (maxCount == 1)
-  {
-    std::cout << "MAXSEQ 0" << std::endl;
-  }
-  else
-  {
-    std::cout << "MAXSEQ ";
-    for (size_t i = index - maxCount + 1; i <= index; ++i)
-    {
-      std::cout << polygons[i] << " ";
-    }
-    std::cout << std::endl << maxCount << std::endl;
-  }
+  currentCount = std::count_if(value.begin(), value.end(), counter);
+  maxCount = std::max(maxCount, currentCount);
+
+  std::cout << maxCount << "\n";
 }
