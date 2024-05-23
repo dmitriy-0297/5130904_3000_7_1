@@ -219,9 +219,9 @@ void methods::lessArea(std::vector<Polygon>& polygons)
   std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
 }
 
-void methods::maxseq(std::vector<anisimov::Polygon>& value)
+void methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 {
-  if (value.empty())
+  if (polygons.empty())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
@@ -246,7 +246,7 @@ void methods::maxseq(std::vector<anisimov::Polygon>& value)
       }
       return false;
     };
-  currentCount = std::count_if(value.begin(), value.end(), counter);
+  currentCount = std::count_if(polygons.begin(), polygons.end(), counter);
   maxCount = std::max(maxCount, currentCount);
   std::cout << maxCount << "\n";
 }

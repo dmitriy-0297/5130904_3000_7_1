@@ -12,7 +12,7 @@ namespace methods
   void getMin(const std::vector<anisimov::Polygon>& polygons);
   void getQuantity(const std::vector<anisimov::Polygon>& polygons);
   void lessArea(std::vector<anisimov::Polygon>& polygons);
-  void maxseq(std::vector<anisimov::Polygon>& value);
+  void maxseq(std::vector<anisimov::Polygon>& polygons);
 }
 
 #endif
