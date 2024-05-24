@@ -5,6 +5,7 @@
 
 namespace anisimov
 {
+
   struct Point
   {
     int x;
