@@ -229,9 +229,6 @@ void anisimov::methods::maxseq(std::vector<anisimov::Polygon>& polygons)
   anisimov::Polygon poly;
   std::cin >> poly;
 
-  if (std::cin.fail() || std::cin.get() != '\n')
-    throw std::runtime_error("<INVALID COMMAND>");
-
   int maxCount = 0;
   int currentCount = 0;
 
