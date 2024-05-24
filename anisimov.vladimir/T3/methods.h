@@ -1,4 +1,4 @@
-ifndef METHODS_H
+#ifndef METHODS_H
 #define METHODS_H
 
 #include "local.h"
