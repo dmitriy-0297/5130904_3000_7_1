@@ -96,11 +96,22 @@ std::istream& anisimov::operator>>(std::istream& in, anisimov::Point& point)
 
 std::istream& anisimov::operator>>(std::istream& in, anisimov::Polygon& polygon)
 {
-  size_t numVertices;
-  in >> numVertices;
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  size_t amountPoints;
+  in >> amountPoints;
+  if (amountPoints < 3)
+  {
+    in.setstate(std::istream::failbit);
+    return in;
+  }
 
   polygon.points.clear();
-  polygon.points.resize(numVertices);
+  polygon.points.resize(amountPoints);
 
   for (anisimov::Point& point : polygon.points)
   {
