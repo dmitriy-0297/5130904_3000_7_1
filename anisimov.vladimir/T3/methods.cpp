@@ -221,16 +221,16 @@ void anisimov::methods::lessArea(std::vector<Polygon>& polygons)
 
 void anisimov::methods::maxseq(std::vector<anisimov::Polygon>& polygons)
 {
-  if (polygons.empty())
+  std::string command;
+  std::cin >> command;
+
+  if (command != "MAXSEQ")
   {
     throw "<INVALID COMMAND>";
   }
 
   anisimov::Polygon poly;
   std::cin >> poly;
-
-  if (std::cin.fail() || std::cin.get() != '\n')
-    throw "<INVALID COMMAND>";
 
   int maxCount = 0;
   int currentCount = 0;
