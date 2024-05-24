@@ -5,6 +5,19 @@
 
 namespace anisimov
 {
+  std::istream& operator>>(std::istream& in, Polygon& polygon) {
+    size_t numVertices;
+    in >> numVertices;
+
+    polygon.points.clear();
+
+    for (size_t i = 0; i < numVertices; ++i) {
+      Point vertex;
+      in >> vertex.x >> vertex.y;
+      polygon.points.push_back(vertex);
+    }
+    return in;
+
   struct Point
   {
     int x;
