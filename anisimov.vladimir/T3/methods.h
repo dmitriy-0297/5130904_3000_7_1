@@ -15,5 +15,4 @@ namespace anisimov {
     void maxseq(std::vector<Polygon>& polygons);
   }
 }
-
 #endif

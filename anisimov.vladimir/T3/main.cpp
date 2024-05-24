@@ -1,9 +1,6 @@
 #include "methods.h"
 
-
 using namespace anisimov::methods;
-
-
 int main(int argc, char* argv[])
 {
   std::vector<anisimov::Polygon> polygons;
