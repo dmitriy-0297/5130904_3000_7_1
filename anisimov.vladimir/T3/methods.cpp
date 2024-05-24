@@ -1,254 +1,162 @@
 #include "methods.h"
+#include <algorithm>
+#include <iostream>
+#include <numeric>
+#include <stdexcept>
+#include <string>
+#include <functional>
 
 using namespace std::placeholders;
 
-int anisimov::convertToInt(const std::string& str)
-{
-  try
-  {
-    return std::stoi(str);
-  }
-  catch (const std::invalid_argument&)
-  {
-    return -1;
-  }
-  catch (const std::out_of_range&)
-  {
-    return -1;
-  }
-}
+namespace anisimov {
+  namespace methods {
 
-void anisimov::getTotalArea(const std::vector<Polygon>& polygons)
-{
-  std::string string;
-  std::cin >> string;
-  int number = convertToInt(string);
-  auto accumulateArea = [&polygons, &number]
-  (double accumulatedArea, const Polygon& current, const std::string method)
-    {
-      double result = accumulatedArea;
-      if (method == "EVEN" && current.points.size() % 2 == 0)
-      {
-        result += current.getArea();
-      }
-      else if (method == "ODD" && current.points.size() % 2 != 0)
-      {
-        result += current.getArea();
-      }
-      else if (method == "MEAN")
-      {
-        result += current.getArea();
-      }
-      else if (method == "SPECIAL" && current.points.size() == static_cast<size_t>(number))
-      {
-        result += current.getArea();
-      }
-      return result;
-    };
+    void area(const std::vector<Polygon>& polygons) {
+      auto accumulateArea_if = [](double ac, const Polygon& poly, std::size_t mod2, std::size_t vertices) {
+        if ((poly.points.size() % 2 == mod2) || (mod2 == 2 && poly.points.size() == vertices) || (mod2 == 3)) {
+          ac += poly.getArea();
+        }
+        return ac;
+        };
 
-  if (number == -1)
-  {
-    if (string == "EVEN" || string == "ODD")
-    {
-      std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0,
-        std::bind(accumulateArea, _1, _2, string)) << std::endl;
+      std::string arg;
+      std::cin >> arg;
+      if (arg == "EVEN") {
+        std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulateArea_if, _1, _2, 0, 0)) << '\n';
+      }
+      else if (arg == "ODD") {
+        std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulateArea_if, _1, _2, 1, 0)) << '\n';
+      }
+      else if (arg == "MEAN" && !polygons.empty()) {
+        std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulateArea_if, _1, _2, 3, 0)) / polygons.size() << std::endl;
+      }
+      else if (std::all_of(arg.begin(), arg.end(), isdigit) && std::stoi(arg) > 2) {
+        std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0, std::bind(accumulateArea_if, _1, _2, 2, std::stoi(arg))) << '\n';
+      }
+      else {
+        throw std::runtime_error("<INVALID COMMAND>");
+      }
     }
-    else if (string == "MEAN" && !polygons.empty())
-    {
-      std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0,
-        std::bind(accumulateArea, _1, _2, string)) / polygons.size() << std::endl;
-    }
-    else
-    {
-      throw "<INVALID COMMAND>";
-    }
-  }
-  else if (number > 2)
-  {
-    std::cout << std::accumulate(polygons.begin(), polygons.end(), 0.0,
-      std::bind(accumulateArea, _1, _2, "SPECIAL")) << std::endl;
-  }
-  else
-  {
-    throw "<INVALID COMMAND>";
-  }
-}
 
-void anisimov::getMax(const std::vector<Polygon>& polygons)
-{
-  std::string string;
-  std::cin >> string;
+    void min(const std::vector<Polygon>& polygons) {
+      if (polygons.empty())
+        throw std::runtime_error("<INVALID COMMAND>");
 
-  if (polygons.empty())
-  {
-    throw "<INVALID COMMAND>";
-  }
+      std::string arg;
+      std::cin >> arg;
 
-  std::vector<size_t> vectorSize(polygons.size());
-
-  std::transform(polygons.begin(), polygons.end(), vectorSize.begin(),
-    [](const Polygon& poly)
-    {
-      return poly.points.size();
-    });
-
-  auto polygon = std::max_element(polygons.begin(), polygons.end());
-  auto maxSize = std::max_element(vectorSize.begin(), vectorSize.end());
-
-  if (string == "AREA")
-  {
-    std::cout << polygon->getArea() << std::endl;
-  }
-  else if (string == "VERTEXES")
-  {
-    std::cout << *maxSize << std::endl;
-  }
-  else
-  {
-    throw "<INVALID COMMAND>";
-  }
-}
-
-void anisimov::getMin(const std::vector<Polygon>& polygons)
-{
-  std::string string;
-  std::cin >> string;
-
-  if (polygons.empty())
-  {
-    throw "<INVALID COMMAND>";
-  }
-
-  std::vector<size_t> vectorSize(polygons.size());
-
-  std::transform(polygons.begin(), polygons.end(), vectorSize.begin(),
-    [](const Polygon& poly)
-    {
-      return poly.points.size();
-    });
-
-  auto polygon = std::min_element(polygons.begin(), polygons.end());
-  auto minSize = std::min_element(vectorSize.begin(), vectorSize.end());
-
-  if (string == "AREA")
-  {
-    std::cout << polygon->getArea() << std::endl;
-  }
-  else if (string == "VERTEXES")
-  {
-    std::cout << *minSize << std::endl;
-  }
-  else
-  {
-    throw "<INVALID COMMAND>";
-  }
-}
-
-void anisimov::getQuantity(const std::vector<Polygon>& polygons)
-{
-  std::string string;
-  std::cin >> string;
-  int number = convertToInt(string);
-  auto count = [&number](const Polygon& polygon, const std::string& method)
-    {
-      if (method == "EVEN")
-      {
-        return polygon.points.size() % 2 == 0;
+      if (arg == "AREA") {
+        std::cout << std::min_element(polygons.begin(), polygons.end())->getArea() << '\n';
       }
-      else if (method == "ODD")
-      {
-        return polygon.points.size() % 2 != 0;
+      else if (arg == "VERTEXES") {
+        std::cout << std::accumulate(
+          polygons.begin() + 1,
+          polygons.end(),
+          polygons[0].points.size(),
+          [](std::size_t min, const Polygon& poly) {
+            return (poly.points.size() < min ? poly.points.size() : min);
+          }
+        ) << '\n';
       }
-      else if (method == "SPECIAL")
-      {
-        return polygon.points.size() == static_cast<size_t>(number);
+      else {
+        throw std::runtime_error("<INVALID COMMAND>");
       }
-      return false;
-    };
-
-  if (number == -1)
-  {
-    if (string == "EVEN" || string == "ODD")
-    {
-      std::cout << std::count_if(polygons.begin(), polygons.end(),
-        std::bind(count, _1, string)) << std::endl;
     }
-    else
-    {
-      throw "<INVALID COMMAND>";
+
+    void max(const std::vector<Polygon>& polygons) {
+      if (polygons.empty())
+        throw std::runtime_error("<INVALID COMMAND>");
+
+      std::string arg;
+      std::cin >> arg;
+
+      if (arg == "AREA") {
+        std::cout << std::max_element(polygons.begin(), polygons.end())->getArea() << '\n';
+      }
+      else if (arg == "VERTEXES") {
+        std::cout << std::accumulate(
+          polygons.begin() + 1,
+          polygons.end(),
+          polygons[0].points.size(),
+          [](std::size_t max, const Polygon& poly) {
+            return (poly.points.size() > max ? poly.points.size() : max);
+          }
+        ) << '\n';
+      }
+      else {
+        throw std::runtime_error("<INVALID COMMAND>");
+      }
+    }
+
+    void count(const std::vector<Polygon>& polygons) {
+      auto countPolygons_if = [](const Polygon& poly, std::size_t mod2, std::size_t vertices) {
+        return ((poly.points.size() % 2 == mod2) || (mod2 == 2 && poly.points.size() == vertices));
+        };
+
+      std::string arg;
+      std::cin >> arg;
+      if (arg == "EVEN") {
+        std::cout << std::count_if(polygons.begin(), polygons.end(), std::bind(countPolygons_if, _1, 0, 0)) << '\n';
+      }
+      else if (arg == "ODD") {
+        std::cout << std::count_if(polygons.begin(), polygons.end(), std::bind(countPolygons_if, _1, 1, 0)) << '\n';
+      }
+      else if (std::all_of(arg.begin(), arg.end(), isdigit) && std::stoi(arg) > 2) {
+        std::cout << std::count_if(polygons.begin(), polygons.end(), std::bind(countPolygons_if, _1, 2, std::stoi(arg))) << '\n';
+      }
+      else {
+        throw std::runtime_error("<INVALID COMMAND>");
+      }
+    }
+
+    void echo(std::vector<Polygon>& polygons) {
+      if (polygons.empty()) {
+        throw std::runtime_error("<INVALID COMMAND>");
+      }
+      Polygon poly;
+      std::cin >> poly;
+      if (std::cin.fail() || std::cin.get() != '\n')
+        throw std::runtime_error("<INVALID COMMAND>");
+
+      std::vector<Polygon> result;
+      int count = 0;
+      for (const Polygon& el : polygons) {
+        result.push_back(el);
+        if (el == poly) {
+          ++count;
+          result.push_back(el);
+        }
+      }
+      polygons.resize(result.size());
+      std::copy(result.begin(), result.end(), polygons.begin());
+      std::cout << count << '\n';
+    }
+
+    void maxseq(std::vector<Polygon>& polygons) {
+      if (polygons.empty()) {
+        throw std::runtime_error("<INVALID COMMAND>");
+      }
+      Polygon poly;
+      std::cin >> poly;
+      if (std::cin.fail() || std::cin.get() != '\n')
+        throw std::runtime_error("<INVALID COMMAND>");
+
+      int maxCount = 0;
+      int currentCount = 0;
+
+      auto counter = [&](const Polygon& tPolygon) {
+        if (poly == tPolygon) {
+          currentCount++;
+        }
+        else {
+          maxCount = std::max(maxCount, currentCount);
+          currentCount = 0;
+        }
+        return false;
+        };
+      currentCount = std::count_if(polygons.begin(), polygons.end(), counter);
+      maxCount = std::max(maxCount, currentCount);
+      std::cout << maxCount << "\n";
     }
   }
-  else if (number > 2)
-  {
-    std::cout << std::count_if(polygons.begin(), polygons.end(),
-      std::bind(count, _1, "SPECIAL")) << std::endl;
-  }
-  else
-  {
-    throw "<INVALID COMMAND>";
-  }
-}
-
-void anisimov::lessArea(std::vector<Polygon>& polygons)
-{
-  if (polygons.empty())
-  {
-    throw "<INVALID COMMAND>";
-  }
-
-  Polygon basic;
-  std::cin >> basic;
-
-  auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin), std::istream_iterator<char>(), isspace);
-  if (*firstNonWhitespace == std::iostream::traits_type::eof() || *firstNonWhitespace == int('n'))
-  {
-    throw "<INVALID COMMAND>";
-  }
-  if (!isspace(*firstNonWhitespace))
-  {
-    std::cin.setstate(std::ios_base::failbit);
-    throw "<INVALID COMMAND>";
-  }
-
-  auto comparison = [&](const Polygon polygon)
-    {
-      return std::greater<double>()(basic.getArea(), polygon.getArea());
-    };
-
-  std::cout << std::count_if(polygons.begin(), polygons.end(), comparison) << std::endl;
-}
-
-void anisimov::maxseq(std::vector<Polygon>& polygons)
-{
-  if (polygons.empty())
-  {
-    throw std::runtime_error("<INVALID COMMAND>");
-  }
-
-  anisimov::Polygon poly;
-  std::cin >> poly;
-
-  if (std::cin.fail() || std::cin.get() != '\n')
-    throw std::runtime_error("<INVALID COMMAND>");
-
-  int maxCount = 0;
-  int currentCount = 0;
-
-  auto counter = [&](const anisimov::Polygon& tPolygon)
-    {
-      if (poly == tPolygon)
-      {
-        currentCount++;
-      }
-      else
-      {
-        maxCount = std::max(maxCount, currentCount);
-        currentCount = 0;
-      }
-      return false;
-    };
-
-  currentCount = std::count_if(polygons.begin(), polygons.end(), counter);
-  maxCount = std::max(maxCount, currentCount);
-  std::cout << maxCount << "\n";
 }
