@@ -1,9 +1,11 @@
 #include "methods.h"
 
-using namespace anisimov::methods;
+
+using namespace anisimov;
+using namespace methods;
+
 int main(int argc, char* argv[])
 {
-  std::vector<anisimov::Polygon> polygons;
   if (argc != 2)
   {
     std::cerr << "Error (incorrect filename)\n";
