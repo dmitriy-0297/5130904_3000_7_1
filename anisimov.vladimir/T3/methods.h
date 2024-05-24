@@ -4,8 +4,8 @@
 #include "local.h"
 #include "geometry.h"
 
-namespace anisimov
-{
+namespace anisimov {
+  namespace methods {
     int convertToInt(const std::string& str);
     void getTotalArea(const std::vector<Polygon>& polygons);
     void getMax(const std::vector<Polygon>& polygons);
@@ -13,5 +13,7 @@ namespace anisimov
     void getQuantity(const std::vector<Polygon>& polygons);
     void lessArea(std::vector<Polygon>& polygons);
     void maxseq(std::vector<Polygon>& polygons);
+  }
 }
+
 #endif
