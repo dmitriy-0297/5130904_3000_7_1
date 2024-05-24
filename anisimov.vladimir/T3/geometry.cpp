@@ -100,17 +100,7 @@ std::istream& anisimov::operator>>(std::istream& in, anisimov::Polygon& polygon)
   in >> numVertices;
 
   polygon.points.clear();
-
-  for (size_t i = 0; i < numVertices; ++i) {
-    Point vertex;
-    in >> vertex.x >> vertex.y;
-    polygon.points.push_back(vertex);
-  }
-  return in;
-  }
-
-  polygon.points.clear();
-  polygon.points.resize(amountPoints);
+  polygon.points.resize(numVertices);
 
   for (anisimov::Point& point : polygon.points)
   {
