@@ -58,7 +58,7 @@ void area(std::vector<Shape>& shapes)
     }
     double totalArea = std::accumulate(shapes.begin(), shapes.end(), 0.0,
       [vertexCount](double sum, const Shape& shape) {
-        if (shape.points.size() == vertexCount)
+        if (shape.points.size() == static_cast<size_t>(vertexCount))
         {
           return sum + getShapeArea(shape);
         }
@@ -163,7 +163,7 @@ void count(std::vector<Shape>& shapes)
       throw std::invalid_argument("<INVALID COMMAND>");
     }
     std::cout << std::count_if(shapes.begin(), shapes.end(),
-      [vertexCount](const Shape& shape) { return shape.points.size() == vertexCount; }) << std::endl;
+      [vertexCount](const Shape& shape) { return shape.points.size() == static_cast<size_t>(vertexCount); }) << std::endl;
   }
 }
 

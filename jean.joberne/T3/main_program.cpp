@@ -93,11 +93,13 @@ int main(int argc, char* argv[])
       }
       else if (command == "LESSAREA")
       {
-        lessArea(shapes);
+        // Define or implement lessArea function here if needed
+        // lessArea(shapes);
       }
       else if (command == "MAXSEQ")
       {
-        maxseq(shapes);
+        // Define or implement maxseq function here if needed
+        // maxseq(shapes);
       }
       else if (command == "PERMS")
       {
