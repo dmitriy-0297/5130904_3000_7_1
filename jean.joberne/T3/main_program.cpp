@@ -2,15 +2,7 @@
 #include <map>
 #include <stdexcept>
 #include <iostream>
-#include <iterator>
-#include <limits>
-#include <vector>
-#include <string>
-#include <iomanip>
 #include "shape_commands.h"
-
-using namespace jean;
-using namespace methods;
 
 const int ERROR_CODE = 1;
 
@@ -39,80 +31,73 @@ void readShapesFromFile(const std::string& filename, std::vector<Shape>& shapes)
   inputFile.close();
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-  if (argc != 2)
+  try
   {
-    std::cerr << "Error: incorrect filename\n";
-    return ERROR_CODE;
-  }
-
-  const std::string filename = argv[1];
-  std::ifstream file(filename);
-  if (!file)
-  {
-    std::cerr << "Error: file not exist\n";
-    return ERROR_CODE;
-  }
-
-  std::cout << std::setprecision(1) << std::fixed;
-
-  std::vector<Shape> shapes;
-
-  while (!file.eof())
-  {
-    std::copy(std::istream_iterator<Shape>(file),
-      std::istream_iterator<Shape>(),
-      std::back_inserter(shapes));
-
-    if (file.fail() && !file.eof())
+    if (argc < 2)
     {
-      file.clear();
-      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      throw std::runtime_error("Error: No input file provided.");
     }
-  }
 
-  while (!std::cin.eof())
-  {
+    std::vector<Shape> shapes;
+    readShapesFromFile(argv[1], shapes);
+
+    std::cin.clear();
+
     std::string command;
-    std::cin >> command;
-    try
+    while (!std::cin.eof())
     {
-      if (command == "AREA")
+      if (std::cin.fail())
       {
-        area(shapes);
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
-      else if (command == "MAX")
+
+      try
       {
-        max(shapes);
+        std::cin >> command;
+        if (std::cin.eof())
+        {
+          break;
+        }
+        if (command == "PERMS")
+        {
+          perms(shapes);
+        }
+        else if (command == "AREA")
+        {
+          area(shapes);
+        }
+        else if (command == "MAX")
+        {
+          max(shapes);
+        }
+        else if (command == "MIN")
+        {
+          min(shapes);
+        }
+        else if (command == "COUNT")
+        {
+          count(shapes);
+        }
+        else
+        {
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          throw std::invalid_argument("<INVALID COMMAND>");
+        }
       }
-      else if (command == "MIN")
+      catch (const std::exception& e)
       {
-        min(shapes);
+        std::cout << e.what() << '\n';
       }
-      else if (command == "COUNT")
-      {
-        count(shapes);
-      }
-      else if (command == "LESSAREA")
-      {
-        lessArea(shapes);
-      }
-      else if (command == "MAXSEQ")
-      {
-        maxseq(shapes);
-      }
-      else if (!command.empty())
-      {
-        throw "<INVALID COMMAND>";
-      }
-    }
-    catch (const char* error)
-    {
-      std::cout << error << std::endl;
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+    return ERROR_CODE;
+  }
 
-  return EXIT_SUCCESS;
+  return 0;
 }
