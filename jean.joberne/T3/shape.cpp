@@ -9,14 +9,14 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   }
   char symb = '0';
   in >> symb;
-  if (in && symb != dest.exp)
+  if (in && symb != dest.expectedDelimiter)
   {
     in.setstate(std::ios::failbit);
   }
   return in;
 }
 
-std::istream& operator>>(std::istream& in, intIO&& dest)
+std::istream& operator>>(std::istream& in, IntIO&& dest)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -24,7 +24,7 @@ std::istream& operator>>(std::istream& in, intIO&& dest)
     return in;
   }
 
-  in >> dest.ref;
+  in >> dest.reference;
   if (!in)
   {
     in.setstate(std::ios::failbit);
@@ -53,13 +53,13 @@ std::istream& operator>>(std::istream& in, Shape& dest)
   for (size_t i = 0; i < nPoints; ++i)
   {
     Point point;
-    in >> DelimiterIO{ '(' };
-    in >> intIO{ temp };
+    in >> DelimiterIO{'('};
+    in >> IntIO{temp};
     point.x = temp;
-    in >> DelimiterIO{ ';' };
-    in >> intIO{ temp };
+    in >> DelimiterIO{';'};
+    in >> IntIO{temp};
     point.y = temp;
-    in >> DelimiterIO{ ')' };
+    in >> DelimiterIO{')'};
     if (in)
     {
       shape.points.push_back(point);

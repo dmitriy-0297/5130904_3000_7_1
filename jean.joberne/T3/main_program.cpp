@@ -2,6 +2,11 @@
 #include <map>
 #include <stdexcept>
 #include <iostream>
+#include <iterator>
+#include <limits>
+#include <vector>
+#include <string>
+#include <iomanip>
 #include "shape_commands.h"
 
 const int ERROR_CODE = 1;
@@ -31,73 +36,84 @@ void readShapesFromFile(const std::string& filename, std::vector<Shape>& shapes)
   inputFile.close();
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-  try
+  if (argc != 2)
   {
-    if (argc < 2)
-    {
-      throw std::runtime_error("Error: No input file provided.");
-    }
-
-    std::vector<Shape> shapes;
-    readShapesFromFile(argv[1], shapes);
-
-    std::cin.clear();
-
-    std::string command;
-    while (!std::cin.eof())
-    {
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      }
-
-      try
-      {
-        std::cin >> command;
-        if (std::cin.eof())
-        {
-          break;
-        }
-        if (command == "PERMS")
-        {
-          perms(shapes);
-        }
-        else if (command == "AREA")
-        {
-          area(shapes);
-        }
-        else if (command == "MAX")
-        {
-          max(shapes);
-        }
-        else if (command == "MIN")
-        {
-          min(shapes);
-        }
-        else if (command == "COUNT")
-        {
-          count(shapes);
-        }
-        else
-        {
-          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          throw std::invalid_argument("<INVALID COMMAND>");
-        }
-      }
-      catch (const std::exception& e)
-      {
-        std::cout << e.what() << '\n';
-      }
-    }
-  }
-  catch (const std::exception& e)
-  {
-    std::cerr << e.what() << '\n';
+    std::cerr << "Error (incorrect filename)\n";
     return ERROR_CODE;
   }
 
-  return 0;
+  const std::string filename = argv[1];
+  std::ifstream file(filename);
+  if (!file)
+  {
+    std::cerr << "Error: (file not exist)\n";
+    return ERROR_CODE;
+  }
+
+  std::cout << std::setprecision(1) << std::fixed;
+
+  std::vector<Shape> shapes;
+
+  while (!file.eof())
+  {
+    std::copy(std::istream_iterator<Shape>(file),
+      std::istream_iterator<Shape>(),
+      std::back_inserter(shapes));
+
+    if (file.fail() && !file.eof())
+    {
+      file.clear();
+      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+
+  while (!std::cin.eof())
+  {
+    std::string command;
+    std::cin >> command;
+    try
+    {
+      if (command == "AREA")
+      {
+        area(shapes);
+      }
+      else if (command == "MAX")
+      {
+        max(shapes);
+      }
+      else if (command == "MIN")
+      {
+        min(shapes);
+      }
+      else if (command == "COUNT")
+      {
+        count(shapes);
+      }
+      else if (command == "LESSAREA")
+      {
+        lessArea(shapes);
+      }
+      else if (command == "MAXSEQ")
+      {
+        maxseq(shapes);
+      }
+      else if (command == "PERMS")
+      {
+        perms(shapes);
+      }
+      else if (!command.empty())
+      {
+        throw "<INVALID COMMAND>";
+      }
+    }
+    catch (const char* error)
+    {
+      std::cout << error << std::endl;
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+
+  return EXIT_SUCCESS;
 }
