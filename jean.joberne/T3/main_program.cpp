@@ -12,20 +12,47 @@
 using namespace jean;
 using namespace methods;
 
+const int ERROR_CODE = 1;
+
+void readShapesFromFile(const std::string& filename, std::vector<Shape>& shapes)
+{
+  std::ifstream inputFile(filename);
+  if (!inputFile)
+  {
+    throw std::runtime_error("Error: Could not open the input file.");
+  }
+
+  while (!inputFile.eof())
+  {
+    std::copy(
+      std::istream_iterator<Shape>(inputFile),
+      std::istream_iterator<Shape>(),
+      std::back_inserter(shapes)
+    );
+    if (inputFile.fail() && !inputFile.eof())
+    {
+      inputFile.clear();
+      inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+
+  inputFile.close();
+}
+
 int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    std::cerr << "Error (incorrect filename)\n";
-    return EXIT_FAILURE;
+    std::cerr << "Error: incorrect filename\n";
+    return ERROR_CODE;
   }
 
   const std::string filename = argv[1];
   std::ifstream file(filename);
   if (!file)
   {
-    std::cerr << "Error: (file not exist)\n";
-    return EXIT_FAILURE;
+    std::cerr << "Error: file not exist\n";
+    return ERROR_CODE;
   }
 
   std::cout << std::setprecision(1) << std::fixed;
@@ -75,7 +102,7 @@ int main(int argc, char* argv[])
       {
         maxseq(shapes);
       }
-      else if (command != "")
+      else if (!command.empty())
       {
         throw "<INVALID COMMAND>";
       }
