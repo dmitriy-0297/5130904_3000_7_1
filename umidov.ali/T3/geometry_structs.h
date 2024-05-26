@@ -1,5 +1,5 @@
-#ifndef HEADER2_H
-#define HEADER2_H
+#ifndef GEOMETRY_STRUCTS_H
+#define GEOMETRY_STRUCTS_H
 
 #include "local.h"
 
