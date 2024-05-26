@@ -1,7 +1,7 @@
-#include "Header1.h"
-#include "Header2.h"
-#include "set.h"
-const std::string I_C = "<INVALID COMMAND>";
+#include "polygon_operations.h"
+#include "geometry_structs.h"
+#include "local.h"
+const std::string INVALID_COMMAND = "<INVALID COMMAND>";
 
 int cmd::validStringToInt(std::string str)
 {
@@ -45,7 +45,7 @@ void cmd::area(std::vector<geometry::Polygon>& value, const std::string str)
         }
         else
         {
-            throw I_C;
+            throw INVALID_COMMAND;
         }
     }
     else if (data > 2)
@@ -55,7 +55,7 @@ void cmd::area(std::vector<geometry::Polygon>& value, const std::string str)
     }
     else
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 }
 
@@ -63,7 +63,7 @@ void cmd::max(std::vector<geometry::Polygon>& value, const std::string str)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
     if (str == "AREA")
     {
@@ -85,7 +85,7 @@ void cmd::max(std::vector<geometry::Polygon>& value, const std::string str)
     }
     else
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 }
 
@@ -93,7 +93,7 @@ void cmd::min(std::vector<geometry::Polygon>& value, const std::string str)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
     if (str == "AREA")
     {
@@ -115,7 +115,7 @@ void cmd::min(std::vector<geometry::Polygon>& value, const std::string str)
     }
     else
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 }
 
@@ -149,7 +149,7 @@ void cmd::count(std::vector<geometry::Polygon>& value, const std::string str)
     }
     else
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 }
 
@@ -157,7 +157,7 @@ void cmd::lessArea(std::vector<geometry::Polygon>& value)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     geometry::Polygon mainEl, otherEl;
@@ -180,7 +180,7 @@ void cmd::lessArea(std::vector<geometry::Polygon>& value)
     if (std::cin.fail())
     {
         std::cin.clear();
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     auto calcConcur = [&](const geometry::Polygon tPolygon)
@@ -196,7 +196,7 @@ void cmd::maxSeq(std::vector<geometry::Polygon>& value)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     geometry::Polygon mainEl;
@@ -219,7 +219,7 @@ void cmd::maxSeq(std::vector<geometry::Polygon>& value)
     if (std::cin.fail())
     {
         std::cin.clear();
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     int maxCount = 0;
@@ -248,7 +248,7 @@ void cmd::echo(std::vector<geometry::Polygon>& value)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     geometry::Polygon mainEl;
@@ -271,7 +271,7 @@ void cmd::echo(std::vector<geometry::Polygon>& value)
     if (std::cin.fail())
     {
         std::cin.clear();
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     int count = 0;
@@ -290,7 +290,7 @@ void cmd::inFrame(std::vector<geometry::Polygon>& value)
 {
     if (value.empty())
     {
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     geometry::Polygon mainEl;
@@ -313,7 +313,7 @@ void cmd::inFrame(std::vector<geometry::Polygon>& value)
     if (std::cin.fail())
     {
         std::cin.clear();
-        throw I_C;
+        throw INVALID_COMMAND;
     }
 
     auto minMaxX = std::minmax_element(value.begin(), value.end(),
@@ -453,10 +453,10 @@ int main(int argc, char* argv[])
                 }
                 else if (comnd1 != "")
                 {
-                    throw I_C;
+                    throw INVALID_COMMAND;
                 }
             }
-            catch (const std::string k)
+            catch (const std::string& k)
             {
                 std::cout << k << "\n";
             }
