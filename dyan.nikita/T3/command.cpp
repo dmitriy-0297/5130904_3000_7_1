@@ -19,19 +19,19 @@ void command::area(const std::vector<dyan::Polygon>& data)
   std::string arg;
   std::cin >> arg;
   int num = is_a_num(arg);
-  auto countFunc = [](double ac, const dyan::Polygon& poly, int div, int mod)
+  auto countFunc = [](double ac, const dyan::Polygon& polygon, int div, int mod)
     {
       double result = ac;
       if (div == -1)
       {
-        if (static_cast<int>(poly.points.size()) == mod)
+        if (static_cast<int>(polygon.points.size()) == mod)
         {
-          result += poly.area();
+          result += polygon.area();
         }
       }
-      else if (static_cast<int>(poly.points.size()) % div == mod || mod == -1)
+      else if (static_cast<int>(polygon.points.size()) % div == mod || mod == -1)
       {
-        result += poly.area();
+        result += polygon.area();
       }
       return result;
     };
@@ -88,7 +88,7 @@ void command::max(const std::vector<dyan::Polygon>& data)
   {
     std::vector<size_t> sizeVec(data.size());
     std::transform(data.begin(), data.end(), sizeVec.begin(),
-      [](const dyan::Polygon& poly) {return poly.points.size(); });
+      [](const dyan::Polygon& polygon) {return polygon.points.size(); });
     std::cout << *std::max_element(sizeVec.begin(), sizeVec.end()) << std::endl;
   }
   else
@@ -113,7 +113,7 @@ void command::min(const std::vector<dyan::Polygon>& data)
   {
     std::vector<size_t> sizeVec(data.size());
     std::transform(data.begin(), data.end(), sizeVec.begin(),
-      [](const dyan::Polygon& poly) {return poly.points.size(); });
+      [](const dyan::Polygon& polygon) {return polygon.points.size(); });
     std::cout << *std::min_element(sizeVec.begin(), sizeVec.end()) << std::endl;
   }
   else
@@ -127,10 +127,10 @@ void command::count(const std::vector<dyan::Polygon>& data)
   std::string arg;
   std::cin >> arg;
   int num = is_a_num(arg);
-  auto countFunc = [](int ac, const dyan::Polygon& poly, int div, int mod)
+  auto countFunc = [](int ac, const dyan::Polygon& polygon, int div, int mod)
     {
       int result = ac;
-      if (static_cast<int>(poly.points.size()) % div == mod || mod == -1)
+      if (static_cast<int>(polygon.points.size()) % div == mod || mod == -1)
       {
         result += 1;
       }
@@ -170,9 +170,9 @@ void command::rmecho(std::vector<dyan::Polygon>& data)
   std::cin >> target;
   prev = data[0];
   int count = 0;
-  auto removeCond = [&target, &prev, &count](const dyan::Polygon& poly) {
-    bool result = poly == prev && poly == target;
-    prev = poly;
+  auto removeCond = [&target, &prev, &count](const dyan::Polygon& polygon) {
+    bool result = polygon == prev && polygon == target;
+    prev = polygon;
     if (result)
     {
       count++;
@@ -196,9 +196,9 @@ void command::same(std::vector<dyan::Polygon>& data)
   else
   {
     std::sort(target.points.begin(), target.points.end());
-    auto countFunc = [&target](const dyan::Polygon& poly)
+    auto countFunc = [&target](const dyan::Polygon& polygon)
       {
-        return poly.is_overlay_compatible(target);
+        return polygon.is_overlay_compatible(target);
       };
     std::cout << std::count_if(data.begin(), data.end(), countFunc) << std::endl;
   }

@@ -9,23 +9,22 @@ bool dyan::Point::operator==(const Point& other) const
 
 bool dyan::Point::operator!=(const Point& other) const
 {
-  return x != other.x || y != other.y;
+  return !(*this == other);
 }
 
 bool dyan::Point::operator<(const Point& other) const
 {
-  if (x == other.x) return y < other.y;
-  return x < other.x;
+  return (x == other.x) ? (y < other.y) : (x < other.x);
 }
 
 bool dyan::Polygon::operator==(const Polygon& other) const
 {
   if (points.size() != other.points.size()) return false;
-  auto other_pnt = other.points.begin();
-  auto testFunc = [&other_pnt](const Point& pnt)
+  auto other_point = other.points.begin();
+  auto testFunc = [&other_point](const Point& point)
     {
-      bool result = pnt == *other_pnt;
-      other_pnt++;
+      bool result = point == *other_point;
+      other_point++;
       return result;
     };
   return std::all_of(points.begin(), points.end(), testFunc);
