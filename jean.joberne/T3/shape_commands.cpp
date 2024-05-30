@@ -9,16 +9,6 @@
 
 using namespace std::placeholders;
 
-double getArea(const Polygon& shape) {
-  double area = 0.0;
-  size_t size = shape.points.size();
-  for (size_t i = 0; i < size; ++i) {
-    area += shape.points[i].x * shape.points[(i + 1) % size].y -
-            shape.points[i].y * shape.points[(i + 1) % size].x;
-  }
-  return std::fabs(area / 2.0);
-}
-
 void perms(const std::vector<Polygon>& shapes) {
   Polygon local;
   std::cin >> local;
