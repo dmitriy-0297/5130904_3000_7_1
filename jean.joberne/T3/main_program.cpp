@@ -1,121 +1,72 @@
 #include <fstream>
 #include <map>
-#include <stdexcept>
-#include <iostream>
-#include <iterator>
-#include <limits>
 #include <vector>
-#include <string>
-#include <iomanip>
+#include <iterator>
+#include <iostream>
+#include <limits>
+#include <algorithm>
+#include "shape.h"
 #include "shape_commands.h"
 
 const int ERROR_CODE = 1;
+const std::string ERROR_OPEN_FILE = "<ERROR OPENING FILE>";
+const std::string ERROR_FILENAME_NOT_PROVIDED = "<FILENAME NOT PROVIDED>";
+const std::string ERROR_INVALID_COMMAND = "<INVALID COMMAND>";
 
-void readShapesFromFile(const std::string& filename, std::vector<Shape>& shapes)
-{
+void readShapesFromFile(const char* filename, std::vector<Polygon>& shapes) {
   std::ifstream inputFile(filename);
-  if (!inputFile)
-  {
-    throw std::runtime_error("Error: Could not open the input file.");
+  if (!inputFile) {
+    throw std::runtime_error(ERROR_OPEN_FILE);
   }
 
-  while (!inputFile.eof())
-  {
-    std::copy(
-      std::istream_iterator<Shape>(inputFile),
-      std::istream_iterator<Shape>(),
-      std::back_inserter(shapes)
-    );
-    if (inputFile.fail() && !inputFile.eof())
-    {
+  while (!inputFile.eof()) {
+    Polygon shape;
+    inputFile >> shape;
+    if (inputFile) {
+      shapes.push_back(shape);
+    } else {
       inputFile.clear();
       inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
-  inputFile.close();
 }
 
-int main(int argc, char* argv[])
-{
-  if (argc != 2)
-  {
-    std::cerr << "Error (incorrect filename)\n";
+int main(int argc, char** argv) {
+  if (argc < 2) {
+    std::cerr << ERROR_FILENAME_NOT_PROVIDED << std::endl;
     return ERROR_CODE;
   }
 
-  const std::string filename = argv[1];
-  std::ifstream file(filename);
-  if (!file)
-  {
-    std::cerr << "Error: (file not exist)\n";
+  std::vector<Polygon> shapes;
+  try {
+    readShapesFromFile(argv[1], shapes);
+  } catch (const std::exception& e) {
+    std::cerr << ERROR_OPEN_FILE << std::endl;
     return ERROR_CODE;
   }
 
-  std::cout << std::setprecision(1) << std::fixed;
-
-  std::vector<Shape> shapes;
-
-  while (!file.eof())
-  {
-    std::copy(std::istream_iterator<Shape>(file),
-      std::istream_iterator<Shape>(),
-      std::back_inserter(shapes));
-
-    if (file.fail() && !file.eof())
-    {
-      file.clear();
-      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-  }
-
-  while (!std::cin.eof())
-  {
-    std::string command;
-    std::cin >> command;
-    try
-    {
-      if (command == "AREA")
-      {
-        area(shapes);
-      }
-      else if (command == "MAX")
-      {
-        max(shapes);
-      }
-      else if (command == "MIN")
-      {
-        min(shapes);
-      }
-      else if (command == "COUNT")
-      {
-        count(shapes);
-      }
-      else if (command == "LESSAREA")
-      {
-        // Define or implement lessArea function here if needed
-        // lessArea(shapes);
-      }
-      else if (command == "MAXSEQ")
-      {
-        // Define or implement maxseq function here if needed
-        // maxseq(shapes);
-      }
-      else if (command == "PERMS")
-      {
+  std::cin.clear();
+  std::string command;
+  while (std::cin >> command) {
+    try {
+      if (command == "PERMS") {
         perms(shapes);
+      } else if (command == "AREA") {
+        area(shapes);
+      } else if (command == "MAX") {
+        max(shapes);
+      } else if (command == "MIN") {
+        min(shapes);
+      } else if (command == "COUNT") {
+        count(shapes);
+      } else {
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        throw std::invalid_argument(ERROR_INVALID_COMMAND);
       }
-      else if (!command.empty())
-      {
-        throw "<INVALID COMMAND>";
-      }
-    }
-    catch (const char* error)
-    {
-      std::cout << error << std::endl;
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    } catch (const std::exception& e) {
+      std::cout << ERROR_INVALID_COMMAND << std::endl;
     }
   }
 
-  return EXIT_SUCCESS;
+  return 0;
 }

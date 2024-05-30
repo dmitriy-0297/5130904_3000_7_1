@@ -3,11 +3,10 @@
 
 #include <iostream>
 
-class IoFormatGuard
-{
+class Iofmtguard {
 public:
-  IoFormatGuard(std::basic_ios<char>& s);
-  ~IoFormatGuard();
+  Iofmtguard(std::basic_ios<char>& s);
+  ~Iofmtguard();
 
 private:
   std::basic_ios<char>& s_;
@@ -16,4 +15,4 @@ private:
   std::basic_ios<char>::fmtflags fmt_;
 };
 
-#endif
+#endif // IO_FORMAT_GUARD_H
