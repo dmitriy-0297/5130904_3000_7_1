@@ -5,6 +5,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <functional>
+#include <iomanip> // Добавлено для использования std::setprecision
 
 using namespace std::placeholders;
 

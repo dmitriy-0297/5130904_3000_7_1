@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <stdexcept>
 #include "shape.h"
 #include "shape_commands.h"
 
