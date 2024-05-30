@@ -55,12 +55,12 @@ bool dyan::Polygon::is_overlay_compatible(const Polygon& other) const
   std::sort(sorted_points.begin(), sorted_points.end());
   double x_offset = other.points[0].x - sorted_points[0].x;
   double y_offset = other.points[0].y - sorted_points[0].y;
-  auto sorted_pnt = sorted_points.begin();
-  auto testFunc = [&sorted_pnt, &x_offset, &y_offset](const Point& point)
+  auto sorted_point = sorted_points.begin();
+  auto testFunc = [&sorted_point, &x_offset, &y_offset](const Point& point)
     {
-      bool result = point.x - (*sorted_pnt).x == x_offset
-        && point.y - (*sorted_pnt).y == y_offset;
-      sorted_pnt++;
+      bool result = point.x - (*sorted_point).x == x_offset
+        && point.y - (*sorted_point).y == y_offset;
+      sorted_point++;
       return result;
     };
   return std::all_of(other.points.begin(), other.points.end(), testFunc);
@@ -111,14 +111,15 @@ std::istream& dyan::operator>>(std::istream& in, Polygon& polygon)
   polygon.points.clear();
   polygon.points.resize(size);
 
-  for (auto& point : polygon.points)
+  for (size_t i = 0; i < size; i++)
   {
-    in >> point;
+    in >> polygon.points[i];
   }
 
-  if (in.peek() != '\n' && !in.eof())
+  if (in.peek() != int('\n') && !in.eof())
   {
     in.setstate(std::ios::failbit);
+    return in;
   }
 
   return in;
@@ -132,9 +133,9 @@ std::ostream& dyan::operator<<(std::ostream& out, const Polygon& polygon)
     return out;
   }
   out << polygon.points.size() << " ";
-  for (const auto& p : polygon.points)
+  for (const auto& point : polygon.points)
   {
-    out << p << " ";
+    out << point << " ";
   }
   return out;
 }

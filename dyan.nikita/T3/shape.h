@@ -27,7 +27,7 @@ namespace dyan
   {
     char exp;
 
-    Delimeter(const char expected) : exp(expected)
+    Delimeter(const char exp) : exp(exp)
     {
     }
   };

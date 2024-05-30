@@ -2,6 +2,7 @@
 
 using namespace std::placeholders;
 
+const std::string INVALID_COMMAND = "<INVALID COMMAND>";
 int command::is_a_num(const std::string& str)
 {
   try
@@ -51,14 +52,14 @@ void command::area(const std::vector<dyan::Polygon>& data)
     {
       if (data.size() == 0)
       {
-        throw "<INVALID COMMAND>";
+        throw INVALID_COMMAND;
       }
       std::cout << std::accumulate(data.begin(), data.end(), 0.0,
         std::bind(countFunc, _1, _2, 2, -1)) / data.size() << std::endl;
     }
     else
     {
-      throw "<INVALID COMMAND>";
+      throw INVALID_COMMAND;
     }
   }
   else if (num > 2)
@@ -68,7 +69,7 @@ void command::area(const std::vector<dyan::Polygon>& data)
   }
   else
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
 }
 
@@ -78,7 +79,7 @@ void command::max(const std::vector<dyan::Polygon>& data)
   std::cin >> arg;
   if (data.size() == 0)
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
   if (arg == "AREA")
   {
@@ -93,7 +94,7 @@ void command::max(const std::vector<dyan::Polygon>& data)
   }
   else
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
 }
 
@@ -103,7 +104,7 @@ void command::min(const std::vector<dyan::Polygon>& data)
   std::cin >> arg;
   if (data.size() == 0)
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
   if (arg == "AREA")
   {
@@ -118,7 +119,7 @@ void command::min(const std::vector<dyan::Polygon>& data)
   }
   else
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
 }
 
@@ -150,7 +151,7 @@ void command::count(const std::vector<dyan::Polygon>& data)
     }
     else
     {
-      throw "<INVALID COMMAND>";
+      throw INVALID_COMMAND;
     }
   }
   else if (num > 2)
@@ -160,7 +161,7 @@ void command::count(const std::vector<dyan::Polygon>& data)
   }
   else
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
 }
 
@@ -191,7 +192,7 @@ void command::same(std::vector<dyan::Polygon>& data)
 
   if (!std::cin)
   {
-    throw "<INVALID COMMAND>";
+    throw INVALID_COMMAND;
   }
   else
   {
