@@ -2,130 +2,90 @@
 
 using namespace std::placeholders;
 
-bool dyan::Point::operator==(const Point& other) const
-{
-  return x == other.x && y == other.y;
-}
+namespace dyan {
 
-bool dyan::Point::operator!=(const Point& other) const
-{
-  return x != other.x || y != other.y;
-}
-
-bool dyan::Point::operator<(const Point& other) const
-{
-  if (x == other.x) return y < other.y;
-  return x < other.x;
-}
-
-bool dyan::Polygon::operator==(const Polygon& other) const
-{
-  if (points.size() != other.points.size()) return false;
-  auto other_pnt = other.points.begin();
-  auto testFunc = [&other_pnt](const Point& point)
-    {
-      bool result = point == *other_pnt;
-      other_pnt++;
-      return result;
-    };
-  return std::all_of(points.begin(), points.end(), testFunc);
-}
-
-bool dyan::Polygon::operator<(const Polygon& other) const
-{
-  return area() < other.area();
-}
-
-double dyan::Polygon::area(void) const
-{
-  double res = 0;
-  for (int i = 1; i < static_cast<int>(points.size()); i++)
-  {
-    res += points[i - 1].x * points[i].y;
-    res -= points[i].x * points[i - 1].y;
-  }
-  res += (*points.rbegin()).x * (*points.begin()).y;
-  res -= (*points.rbegin()).y * (*points.begin()).x;
-  return 0.5 * abs(res);
-}
-
-bool dyan::Polygon::is_overlay_compatible(const Polygon& other) const
-{
-  if (points.size() != other.points.size()) return false;
-  std::vector<dyan::Point> sorted_points(points);
-  std::sort(sorted_points.begin(), sorted_points.end());
-  double x_offset = other.points[0].x - sorted_points[0].x;
-  double y_offset = other.points[0].y - sorted_points[0].y;
-  auto sorted_point = sorted_points.begin();
-  auto testFunc = [&sorted_point, &x_offset, &y_offset](const Point& point)
-    {
-      bool result = point.x - (*sorted_point).x == x_offset
-        && point.y - (*sorted_point).y == y_offset;
-      sorted_point++;
-      return result;
-    };
-  return std::all_of(other.points.begin(), other.points.end(), testFunc);
-}
-
-std::istream& dyan::operator>>(std::istream& in, Polygon& polygon)
-{
-  std::istream::sentry guard(in);
-  if (!guard)
-  {
-    return in;
-  }
-  size_t size;
-  in >> size;
-  if (size < 3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  polygon.points.clear();
-  polygon.points.resize(size);
-
-  for (size_t i = 0; i < size; i++)
-  {
-    in >> polygon.points[i];
+  bool Point::operator==(const Point& other) const {
+    return x == other.x && y == other.y;
   }
 
-  if (in.peek() != int('\n') && !in.eof())
-  {
-    in.setstate(std::ios::failbit);
+  bool Point::operator!=(const Point& other) const {
+    return !(*this == other);
+  }
+
+  bool Point::operator<(const Point& other) const {
+    if (x == other.x) return y < other.y;
+    return x < other.x;
+  }
+
+  bool Polygon::operator==(const Polygon& other) const {
+    if (points.size() != other.points.size()) return false;
+    return std::equal(points.begin(), points.end(), other.points.begin());
+  }
+
+  bool Polygon::operator<(const Polygon& other) const {
+    return area() < other.area();
+  }
+
+  double Polygon::area() const {
+    double res = 0;
+    for (size_t i = 1; i < points.size(); ++i) {
+      res += points[i - 1].x * points[i].y - points[i].x * points[i - 1].y;
+    }
+    res += points.back().x * points.front().y - points.back().y * points.front().x;
+    return 0.5 * std::abs(res);
+  }
+
+  bool Polygon::is_overlay_compatible(const Polygon& other) const {
+    if (points.size() != other.points.size()) return false;
+    std::vector<Point> sorted_points(points);
+    std::sort(sorted_points.begin(), sorted_points.end());
+    double x_offset = other.points[0].x - sorted_points[0].x;
+    double y_offset = other.points[0].y - sorted_points[0].y;
+    return std::equal(other.points.begin(), other.points.end(), sorted_points.begin(), [x_offset, y_offset](const Point& p1, const Point& p2) {
+      return p1.x - p2.x == x_offset && p1.y - p2.y == y_offset;
+      });
+  }
+
+  std::istream& operator>>(std::istream& in, Point& point) {
+    return in >> point.x >> point.y;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const Point& point) {
+    return out << point.x << " " << point.y;
+  }
+
+  std::istream& operator>>(std::istream& in, Polygon& polygon) {
+    size_t size;
+    in >> size;
+    if (size < 3) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+    polygon.points.resize(size);
+    for (auto& point : polygon.points) {
+      if (!(in >> point)) {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+    }
     return in;
   }
 
-  return in;
-}
-
-std::ostream& dyan::operator<<(std::ostream& out, const Polygon& polygon)
-{
-  std::ostream::sentry guard(out);
-  if (!guard)
-  {
+  std::ostream& operator<<(std::ostream& out, const Polygon& polygon) {
+    out << polygon.points.size() << " ";
+    for (const auto& point : polygon.points) {
+      out << point << " ";
+    }
     return out;
   }
-  out << polygon.points.size() << " ";
-  for (const auto& point : polygon.points)
-  {
-    out << point << " ";
-  }
-  return out;
-}
 
-std::istream& dyan::operator>>(std::istream& in, Delimeter&& del)
-{
-  std::istream::sentry guard(in);
-  if (!guard)
-  {
+  std::istream& operator>>(std::istream& in, Delimeter&& del) {
+    char symbol;
+    in >> symbol;
+    if (!in || symbol != del.exp) {
+      in.setstate(std::ios::failbit);
+    }
     return in;
   }
-  char symbol;
-  in >> symbol;
 
-  if (!in || symbol != del.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
 }
