@@ -167,37 +167,22 @@ void command::count(const std::vector<dyan::Polygon>& data)
 
 void command::rmecho(std::vector<dyan::Polygon>& data)
 {
-  dyan::Polygon target, previous;
-
-  // Read the target polygon from input
-  if (!(std::cin >> target)) {
-    std::cin.clear();
-    throw std::invalid_argument(INVALID_COMMAND);
-  }
-
-  int ch = 0;
-  while (ch = std::cin.get() && ch != '\n' && ch != EOF) {
-    if (!isspace(ch)) {
-      std::cin.setstate(std::istream::failbit);
-      break;
+  dyan::Polygon target, prev;
+  std::cin >> target;
+  prev = data[0];
+  int count = 0;
+  auto removeCond = [&target, &prev, &count](const dyan::Polygon& polygon) {
+    bool result = polygon == prev && polygon == target;
+    prev = polygon;
+    if (result)
+    {
+      count++;
     }
-  }
-
-  if (!std::cin || data.empty()) {
-    std::cin.clear();
-    throw std::invalid_argument(INVALID_COMMAND);
-  }
-
-  previous = data.front();
-
-  auto isEchoPolygon = [&target, &previous](const dyan::Polygon& current) {
-    bool isEcho = (current == previous && current == target);
-    previous = current;
-    return isEcho;
+    return result;
     };
-
-  auto newEnd = std::remove_if(data.begin() + 1, data.end(), isEchoPolygon);
-  data.erase(newEnd, data.end());
+  auto removeFunc = std::remove_if(data.begin() + 1, data.end(), removeCond);
+  data.erase(removeFunc, data.end());
+  std::cout << count << std::endl;
 }
 
 void command::same(std::vector<dyan::Polygon>& polygons)
