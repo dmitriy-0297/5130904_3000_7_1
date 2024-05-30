@@ -185,43 +185,36 @@ void command::rmecho(std::vector<dyan::Polygon>& data)
   std::cout << count << std::endl;
 }
 
-void command::same(std::vector<dyan::Polygon>& polygons)
+void command::same(std::vector<dyan::Polygon>& data)
 {
-  if (polygons.empty())
+  if (data.empty())
   {
-    throw INVALID_COMMAND;
+    throw std::invalid_argument(INVALID_COMMAND);
   }
 
   dyan::Polygon basic;
   std::cin >> basic;
 
-  auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin),
-    std::istream_iterator<char>(), isspace);
-  if (*firstNonWhitespace == std::iostream::traits_type::eof() or *firstNonWhitespace == int('n'))
+  if (!std::cin)
   {
-    throw INVALID_COMMAND;
-  }
-  if (!isspace(*firstNonWhitespace))
-  {
-    std::cin.setstate(std::ios_base::failbit);
-    throw INVALID_COMMAND;
+    throw std::invalid_argument(INVALID_COMMAND);
   }
 
-  int count = 0;
-
-  auto counter = [&](const dyan::Polygon polygon)
+  int ch;
+  while ((ch = std::cin.get()) != '\n' && ch != EOF)
+  {
+    if (!isspace(ch))
     {
-      if (basic == polygon)
-      {
-        count++;
-      }
-      else
-      {
-        count = 0;
-        return false;
-      }
-      return true;
+      std::cin.setstate(std::ios::failbit);
+      throw std::invalid_argument(INVALID_COMMAND);
+    }
+  }
+
+  auto countFunc = [&basic](const dyan::Polygon& polygon)
+    {
+      return basic.is_overlay_compatible(polygon);
     };
-  count = std::count_if(polygons.begin(), polygons.end(), counter);
+
+  int count = std::count_if(data.begin(), data.end(), countFunc);
   std::cout << count << "\n";
 }

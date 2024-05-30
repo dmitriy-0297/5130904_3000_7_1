@@ -1,9 +1,4 @@
-#include <iostream>
-#include <iterator>
-#include <iomanip>
-#include <fstream>
-#include <limits>
-
+#include "local.h"
 #include "shape.h"
 #include "command.h"
 

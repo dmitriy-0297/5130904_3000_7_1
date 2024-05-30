@@ -9,5 +9,8 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <iterator>
+#include <iomanip>
+#include <fstream>
 
 #endif
