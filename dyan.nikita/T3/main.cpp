@@ -7,7 +7,7 @@
 #include "shape.h"
 #include "command.h"
 
-const std::string INVALID_COMMAND = "<INVALID_COMMAND>";
+const std::string INVALID_COMMAND = "<INVALID COMMAND>";
 const std::string INCORRECT_USAGE = "Incorrect usage";
 const std::string FILE_NOT_FOUND = "File not found";
 const std::string UNEXPECTED_ERROR = "Something went wrong";
