@@ -92,8 +92,8 @@ bool kolpakova::Polygon::contains(const Point& point) const
   std::vector<int> xArr(points.size());
   std::vector<int> yArr(points.size());
 
-  std::transform(points.begin(), points.end(), xArr.begin(), [](const Point& point) { 
-    return point.x; 
+  std::transform(points.begin(), points.end(), xArr.begin(), [](const Point& point) {
+    return point.x;
     });
 
   int maxX = *std::max_element(xArr.begin(), xArr.end());

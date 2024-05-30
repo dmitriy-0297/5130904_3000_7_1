@@ -80,7 +80,7 @@ void command::min(const std::vector<kolpakova::Polygon>& data)
 
   std::transform(data.begin(), data.end(), sizeVec.begin(),
     [](const Polygon& poly) {
-      return poly.points.size(); 
+      return poly.points.size();
     });
   auto poly = std::min_element(data.begin(), data.end());
   auto minSize = std::min_element(sizeVec.begin(), sizeVec.end());
@@ -105,8 +105,8 @@ void command::max(const std::vector<kolpakova::Polygon>& data)
   std::vector<size_t> sizeVec(data.size());
 
   std::transform(data.begin(), data.end(), sizeVec.begin(),
-    [](const Polygon& poly) { 
-      return poly.points.size(); 
+    [](const Polygon& poly) {
+      return poly.points.size();
     });
   auto poly = std::max_element(data.begin(), data.end());
   auto maxSize = std::max_element(sizeVec.begin(), sizeVec.end());
