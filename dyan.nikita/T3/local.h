@@ -2,11 +2,11 @@
 #define LOCAL_H
 
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <functional>
 #include <cmath>
 #include <numeric>
+#include <vector>
 #include <string>
 #include <limits>
 

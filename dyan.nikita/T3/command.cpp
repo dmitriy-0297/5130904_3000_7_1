@@ -167,40 +167,76 @@ void command::count(const std::vector<dyan::Polygon>& data)
 
 void command::rmecho(std::vector<dyan::Polygon>& data)
 {
-  dyan::Polygon target, prev;
-  std::cin >> target;
-  prev = data[0];
-  int count = 0;
-  auto removeCond = [&target, &prev, &count](const dyan::Polygon& polygon) {
-    bool result = polygon == prev && polygon == target;
-    prev = polygon;
-    if (result)
-    {
-      count++;
+  dyan::Polygon target, previous;
+
+  // Read the target polygon from input
+  if (!(std::cin >> target)) {
+    std::cin.clear();
+    throw std::invalid_argument(INVALID_COMMAND);
+  }
+
+  int ch = 0;
+  while (ch = std::cin.get() && ch != '\n' && ch != EOF) {
+    if (!isspace(ch)) {
+      std::cin.setstate(std::istream::failbit);
+      break;
     }
-    return result;
+  }
+
+  if (!std::cin || data.empty()) {
+    std::cin.clear();
+    throw std::invalid_argument(INVALID_COMMAND);
+  }
+
+  previous = data.front();
+
+  auto isEchoPolygon = [&target, &previous](const dyan::Polygon& current) {
+    bool isEcho = (current == previous && current == target);
+    previous = current;
+    return isEcho;
     };
-  auto removeFunc = std::remove_if(data.begin() + 1, data.end(), removeCond);
-  data.erase(removeFunc, data.end());
-  std::cout << count << std::endl;
+
+  auto newEnd = std::remove_if(data.begin() + 1, data.end(), isEchoPolygon);
+  data.erase(newEnd, data.end());
 }
 
-void command::same(std::vector<dyan::Polygon>& data)
+void command::same(std::vector<dyan::Polygon>& polygons)
 {
-  dyan::Polygon target;
-  std::cin >> target;
-
-  if (!std::cin)
+  if (polygons.empty())
   {
     throw INVALID_COMMAND;
   }
-  else
+
+  dyan::Polygon basic;
+  std::cin >> basic;
+
+  auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin),
+    std::istream_iterator<char>(), isspace);
+  if (*firstNonWhitespace == std::iostream::traits_type::eof() or *firstNonWhitespace == int('n'))
   {
-    std::sort(target.points.begin(), target.points.end());
-    auto countFunc = [&target](const dyan::Polygon& polygon)
-      {
-        return polygon.is_overlay_compatible(target);
-      };
-    std::cout << std::count_if(data.begin(), data.end(), countFunc) << std::endl;
+    throw INVALID_COMMAND;
   }
+  if (!isspace(*firstNonWhitespace))
+  {
+    std::cin.setstate(std::ios_base::failbit);
+    throw INVALID_COMMAND;
+  }
+
+  int count = 0;
+
+  auto counter = [&](const dyan::Polygon polygon)
+    {
+      if (basic == polygon)
+      {
+        count++;
+      }
+      else
+      {
+        count = 0;
+        return false;
+      }
+      return true;
+    };
+  count = std::count_if(polygons.begin(), polygons.end(), counter);
+  std::cout << count << "\n";
 }
