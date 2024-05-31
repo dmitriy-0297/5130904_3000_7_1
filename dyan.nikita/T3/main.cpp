@@ -3,7 +3,7 @@
 #include "command.h"
 
 const std::string INVALID_COMMAND = "<INVALID COMMAND>";
-const std::string INCORRECT_USAGE = "Incorrect usage";
+const std::string ARGUMENT_ERROR = "Not enough arguments";
 const std::string FILE_NOT_FOUND = "File not found";
 const std::string UNEXPECTED_ERROR = "Something went wrong";
 
@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    std::cerr << INCORRECT_USAGE;
+    std::cerr << ARGUMENT_ERROR << std::endl;
     return EXIT_FAILURE;
   }
 

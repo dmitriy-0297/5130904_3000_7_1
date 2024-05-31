@@ -85,7 +85,7 @@ std::istream& dyan::operator>>(std::istream& in, dyan::Delimeter&& dest)
   return in;
 }
 
-std::istream& dyan::operator>>(std::istream& in, dyan::Point& point)
+std::istream& dyan::operator>>(std::istream& in, Point& point)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -93,11 +93,11 @@ std::istream& dyan::operator>>(std::istream& in, dyan::Point& point)
     return in;
   }
 
-  in >> dyan::Delimeter{ '(' } >> point.x >> dyan::Delimeter{ ';' } >> point.y >> dyan::Delimeter{ ')' };
+  in >> Delimeter{ '(' } >> point.x >> Delimeter{ ';' } >> point.y >> Delimeter{ ')' };
   return in;
 }
 
-std::istream& dyan::operator>>(std::istream& in, dyan::Polygon& polygon)
+std::istream& dyan::operator>>(std::istream& in, Polygon& polygon)
 {
   std::istream::sentry sentry(in);
   if (!sentry)
@@ -124,7 +124,7 @@ std::istream& dyan::operator>>(std::istream& in, dyan::Polygon& polygon)
   return in;
 }
 
-std::ostream& dyan::operator<<(std::ostream& out, const dyan::Point& point)
+std::ostream& dyan::operator<<(std::ostream& out, const Point& point)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -135,7 +135,7 @@ std::ostream& dyan::operator<<(std::ostream& out, const dyan::Point& point)
   return out;
 }
 
-std::ostream& dyan::operator<<(std::ostream& out, const dyan::Polygon& polygon)
+std::ostream& dyan::operator<<(std::ostream& out, const Polygon& polygon)
 {
   std::ostream::sentry sentry(out);
   if (!sentry)
@@ -145,9 +145,9 @@ std::ostream& dyan::operator<<(std::ostream& out, const dyan::Polygon& polygon)
 
   out << polygon.points.size() << " ";
 
-  for (const dyan::Point& point : polygon.points)
+  for (const dyan::Point& p : polygon.points)
   {
-    out << point << " ";
+    out << p << " ";
   }
   return out;
 }
