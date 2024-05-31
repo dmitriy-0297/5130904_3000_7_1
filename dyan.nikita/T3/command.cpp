@@ -3,13 +3,14 @@
 using namespace std::placeholders;
 
 const std::string INVALID_COMMAND = "<INVALID COMMAND>";
+
 int command::is_a_num(const std::string& str)
 {
   try
   {
     return std::stoi(str);
   }
-  catch (std::invalid_argument const& er)
+  catch (std::invalid_argument const& ex)
   {
     return -1;
   }
@@ -185,43 +186,22 @@ void command::rmecho(std::vector<dyan::Polygon>& data)
   std::cout << count << std::endl;
 }
 
-void command::same(std::vector<dyan::Polygon>& polygons)
+void command::same(std::vector<dyan::Polygon>& data)
 {
-  if (polygons.empty())
+  dyan::Polygon target;
+  std::cin >> target;
+
+  if (!std::cin)
   {
     throw INVALID_COMMAND;
   }
-
-  dyan::Polygon basic;
-  std::cin >> basic;
-
-  auto firstNonWhitespace = std::find_if_not(std::istream_iterator<char>(std::cin),
-    std::istream_iterator<char>(), isspace);
-  if (*firstNonWhitespace == std::iostream::traits_type::eof() or *firstNonWhitespace == int('n'))
+  else
   {
-    throw INVALID_COMMAND;
-  }
-  if (!isspace(*firstNonWhitespace))
-  {
-    std::cin.setstate(std::ios_base::failbit);
-    throw INVALID_COMMAND;
-  }
-
-  int count = 0;
-
-  auto counter = [&](const dyan::Polygon polygon)
-    {
-      if (basic == polygon)
+    std::sort(target.points.begin(), target.points.end());
+    auto countFunc = [&target](const dyan::Polygon& polygon)
       {
-        count++;
-      }
-      else
-      {
-        count = 0;
-        return false;
-      }
-      return true;
-    };
-  count = std::count_if(polygons.begin(), polygons.end(), counter);
-  std::cout << count << "\n";
+        return polygon.is_overlay_compatible(target);
+      };
+    std::cout << std::count_if(data.begin(), data.end(), countFunc) << std::endl;
+  }
 }

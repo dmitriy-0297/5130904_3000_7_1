@@ -31,6 +31,7 @@ namespace dyan
     {
     }
   };
+
   std::istream& operator>>(std::istream& in, Delimeter&& del);
   std::istream& operator>>(std::istream& in, Point& point);
   std::istream& operator>>(std::istream& in, Polygon& polygon);
