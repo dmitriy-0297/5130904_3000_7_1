@@ -1,13 +1,17 @@
 #ifndef SHAPE_COMMANDS_H
 #define SHAPE_COMMANDS_H
 
-#include <vector>
+#include <functional>
+#include <iomanip>
+#include <algorithm>
+#include <numeric>
+#include <cmath>
 #include "shape.h"
 
-void perms(const std::vector<Polygon>& shapes);
-void area(const std::vector<Polygon>& shapes);
-void max(const std::vector<Polygon>& shapes);
-void min(const std::vector<Polygon>& shapes);
-void count(const std::vector<Polygon>& shapes);
+void perms(std::vector<Shape>& shapes);
+void area(std::vector<Shape>& shapes);
+void max(std::vector<Shape>& shapes);
+void min(std::vector<Shape>& shapes);
+void count(std::vector<Shape>& shapes);
 
 #endif // SHAPE_COMMANDS_H

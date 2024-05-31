@@ -26,13 +26,13 @@ std::istream& operator>>(std::istream& in, IntIO&& dest) {
   return in;
 }
 
-std::istream& operator>>(std::istream& in, Polygon& dest) {
+std::istream& operator>>(std::istream& in, Shape& dest) {
   std::istream::sentry sentry(in);
   if (!sentry) {
     return in;
   }
 
-  Polygon shape;
+  Shape shape;
   size_t nPoints = 0;
   in >> nPoints;
   if (nPoints < 3) {
@@ -61,14 +61,4 @@ std::istream& operator>>(std::istream& in, Polygon& dest) {
     in.setstate(std::ios::failbit);
   }
   return in;
-}
-
-double getArea(const Polygon& shape) {
-  double area = 0.0;
-  size_t size = shape.points.size();
-  for (size_t i = 0; i < size; ++i) {
-    area += shape.points[i].x * shape.points[(i + 1) % size].y -
-            shape.points[i].y * shape.points[(i + 1) % size].x;
-  }
-  return std::fabs(area / 2.0);
 }

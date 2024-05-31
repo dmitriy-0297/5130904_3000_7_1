@@ -1,13 +1,37 @@
-#ifndef SHAPE_COMMANDS_H
-#define SHAPE_COMMANDS_H
+#ifndef SHAPE_H
+#define SHAPE_H
 
+#include <iostream>
+#include <string>
+#include <iterator>
 #include <vector>
-#include "shape.h"
+#include <limits>
+#include <sstream>
+#include "io_format_guard.h"
 
-void perms(const std::vector<Polygon>& shapes);
-void area(const std::vector<Polygon>& shapes);
-void max(const std::vector<Polygon>& shapes);
-void min(const std::vector<Polygon>& shapes);
-void count(const std::vector<Polygon>& shapes);
+struct Point {
+  int x;
+  int y;
 
-#endif // SHAPE_COMMANDS_H
+  bool operator==(const Point& other) const {
+    return (x == other.x) && (y == other.y);
+  }
+};
+
+struct Shape {
+  std::vector<Point> points;
+};
+
+struct DelimiterIO {
+  char exp;
+};
+
+struct IntIO {
+  int& ref;
+};
+
+std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
+std::istream& operator>>(std::istream& in, IntIO&& dest);
+std::istream& operator>>(std::istream& in, Shape& dest);
+
+#endif // SHAPE_H
