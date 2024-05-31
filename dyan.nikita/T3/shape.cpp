@@ -49,7 +49,7 @@ double dyan::Polygon::area(void) const
   return 0.5 * abs(res);
 }
 
-bool dyan::Polygon::is_overlay_compatible(const Polygon& other) const
+bool dyan::Polygon::isOverlayCompatible(const Polygon& other) const
 {
   if (points.size() != other.points.size()) return false;
   std::vector<dyan::Point> sorted_points(points);

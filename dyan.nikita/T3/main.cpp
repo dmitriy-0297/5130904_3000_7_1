@@ -3,83 +3,95 @@
 #include "command.h"
 
 const std::string INVALID_COMMAND = "<INVALID COMMAND>";
-const std::string ARGUMENT_ERROR = "Not enough arguments";
-const std::string FILE_NOT_FOUND = "File not found";
+const std::string INCORRECT_USAGE = "Incorrect usage";
+const std::string NO_SUCH_FILE = "File not found";
 const std::string UNEXPECTED_ERROR = "Something went wrong";
 
 int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    std::cerr << ARGUMENT_ERROR << std::endl;
+    std::cerr << INCORRECT_USAGE << std::endl;
     return EXIT_FAILURE;
   }
-
-  const std::string filename = argv[1];
+  std::string filename = argv[1];
   std::ifstream file(filename);
   if (!file)
   {
-    std::cerr << FILE_NOT_FOUND;
+    std::cerr << NO_SUCH_FILE << std::endl;
     return EXIT_FAILURE;
   }
-
   std::cout << std::setprecision(1) << std::fixed;
-
-  std::vector<dyan::Polygon> fileData;
-
+  std::vector<dyan::Polygon> data;
+  using input_it_t = std::istream_iterator<dyan::Polygon>;
   while (!file.eof())
   {
-    std::copy(std::istream_iterator<dyan::Polygon>(file),
-      std::istream_iterator<dyan::Polygon>(),
-      std::back_inserter(fileData));
-
-    if (file.fail() && !file.eof())
+    std::copy(input_it_t{ file }, input_it_t{}, std::back_inserter(data));
+    if (!file.eof() && file.fail())
     {
       file.clear();
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-
-  while (!std::cin.eof())
+  try
   {
-    std::string cmd;
-    std::cin >> cmd;
-    try
+    while (!std::cin.eof())
     {
-      if (cmd == "AREA")
+      std::string cmd;
+      std::cin >> cmd;
+      try
       {
-        command::area(fileData);
+        if (cmd == "AREA")
+        {
+          std::string arg = "";
+          std::cin >> arg;
+          command::area(data, arg);
+        }
+        else if (cmd == "MAX")
+        {
+          std::string arg = "";
+          std::cin >> arg;
+          command::max(data, arg);
+        }
+        else if (cmd == "MIN")
+        {
+          std::string arg = "";
+          std::cin >> arg;
+          command::min(data, arg);
+        }
+        else if (cmd == "COUNT")
+        {
+          std::string arg = "";
+          std::cin >> arg;
+          command::count(data, arg);
+        }
+        else if (cmd == "RMECHO")
+        {
+          command::rmecho(data);
+        }
+        else if (cmd == "SAME")
+        {
+          dyan::Polygon arg;
+          std::cin >> arg;
+          command::same(data, arg);
+        }
+        else if (cmd != "")
+        {
+          throw std::invalid_argument(INVALID_COMMAND);
+        }
       }
-      else if (cmd == "MAX")
+      catch (const std::invalid_argument& er)
       {
-        command::max(fileData);
-      }
-      else if (cmd == "MIN")
-      {
-        command::min(fileData);
-      }
-      else if (cmd == "COUNT")
-      {
-        command::count(fileData);
-      }
-      else if (cmd == "RMECHO")
-      {
-        command::rmecho(fileData);
-      }
-      else if (cmd == "SAME")
-      {
-        command::same(fileData);
-      }
-      else if (cmd != "")
-      {
-        throw INVALID_COMMAND;
+        std::cout << er.what() << std::endl;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
     }
-    catch (const char* error)
-    {
-      std::cout << error << std::endl;
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+    return EXIT_SUCCESS;
   }
-  return EXIT_SUCCESS;
+  catch (...)
+  {
+    std::cerr << UNEXPECTED_ERROR << std::endl;
+    return EXIT_FAILURE;
+  }
 }

@@ -19,7 +19,7 @@ namespace dyan
     bool operator==(const Polygon& other) const;
     bool operator<(const Polygon& other) const;
     double area(void) const;
-    bool is_overlay_compatible(const Polygon& other) const;
+    bool isOverlayCompatible(const Polygon& other) const;
   };
 
   struct Delimeter

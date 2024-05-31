@@ -6,163 +6,154 @@ const std::string INVALID_COMMAND = "<INVALID COMMAND>";
 
 int command::is_a_num(const std::string& str)
 {
-  try
-  {
-    return std::stoi(str);
-  }
-  catch (std::invalid_argument const& er)
+  char* end;
+  int num = strtol(str.c_str(), &end, 10);
+  if (*end != 0)
   {
     return -1;
   }
+  return num;
 }
 
-void command::area(const std::vector<dyan::Polygon>& data)
+
+void command::area(const std::vector<dyan::Polygon>& data, const std::string& arg)
 {
-  std::string arg;
-  std::cin >> arg;
-  int num = is_a_num(arg);
-  auto countFunc = [](double ac, const dyan::Polygon& polygon, int div, int mod)
+  auto accumulateArea = [](double ac, const dyan::Polygon& polygon, std::size_t mod2, std::size_t vertices)
     {
-      double result = ac;
-      if (div == -1)
+      if ((polygon.points.size() % 2 == mod2) || (mod2 == 2 && polygon.points.size() == vertices) || (mod2 == 3))
       {
-        if (static_cast<int>(polygon.points.size()) == mod)
-        {
-          result += polygon.area();
-        }
+        ac += polygon.area();
       }
-      else if (static_cast<int>(polygon.points.size()) % div == mod || mod == -1)
-      {
-        result += polygon.area();
-      }
-      return result;
+      return ac;
     };
+
+  int num = is_a_num(arg);
+
   if (num == -1)
   {
     if (arg == "EVEN")
     {
       std::cout << std::accumulate(data.begin(), data.end(), 0.0,
-        std::bind(countFunc, _1, _2, 2, 0)) << std::endl;
+        std::bind(accumulateArea, _1, _2, 0, 0)) << '\n';
     }
     else if (arg == "ODD")
     {
       std::cout << std::accumulate(data.begin(), data.end(), 0.0,
-        std::bind(countFunc, _1, _2, 2, 1)) << std::endl;
+        std::bind(accumulateArea, _1, _2, 1, 0)) << '\n';
     }
-    else if (arg == "MEAN")
+    else if (arg == "MEAN" && data.size() != 0)
     {
-      if (data.size() == 0)
-      {
-        throw INVALID_COMMAND;
-      }
       std::cout << std::accumulate(data.begin(), data.end(), 0.0,
-        std::bind(countFunc, _1, _2, 2, -1)) / data.size() << std::endl;
+        std::bind(accumulateArea, _1, _2, 3, 0)) / data.size() << std::endl;
     }
     else
     {
-      throw INVALID_COMMAND;
+      throw std::invalid_argument(INVALID_COMMAND);
     }
   }
   else if (num > 2)
   {
     std::cout << std::accumulate(data.begin(), data.end(), 0.0,
-      std::bind(countFunc, _1, _2, -1, num)) << std::endl;
+      std::bind(accumulateArea, _1, _2, 2, num)) << '\n';
   }
   else
   {
-    throw INVALID_COMMAND;
+    throw std::invalid_argument(INVALID_COMMAND);
   }
 }
 
-void command::max(const std::vector<dyan::Polygon>& data)
+void command::max(const std::vector<dyan::Polygon>& data, const std::string& arg)
 {
-  std::string arg;
-  std::cin >> arg;
-  if (data.size() == 0)
-  {
-    throw INVALID_COMMAND;
-  }
+  if (data.empty())
+    throw std::invalid_argument(INVALID_COMMAND);
+
   if (arg == "AREA")
   {
-    std::cout << std::max_element(data.begin(), data.end())->area() << std::endl;
+    std::cout << std::max_element(data.begin(), data.end())->area() << '\n';
   }
   else if (arg == "VERTEXES")
   {
-    std::vector<size_t> sizeVec(data.size());
-    std::transform(data.begin(), data.end(), sizeVec.begin(),
-      [](const dyan::Polygon& polygon) {return polygon.points.size(); });
-    std::cout << *std::max_element(sizeVec.begin(), sizeVec.end()) << std::endl;
-  }
-  else
-  {
-    throw INVALID_COMMAND;
-  }
-}
+    std::vector<std::size_t> sizes(data.size());
 
-void command::min(const std::vector<dyan::Polygon>& data)
-{
-  std::string arg;
-  std::cin >> arg;
-  if (data.size() == 0)
-  {
-    throw INVALID_COMMAND;
-  }
-  if (arg == "AREA")
-  {
-    std::cout << std::min_element(data.begin(), data.end())->area() << std::endl;
-  }
-  else if (arg == "VERTEXES")
-  {
-    std::vector<size_t> sizeVec(data.size());
-    std::transform(data.begin(), data.end(), sizeVec.begin(),
-      [](const dyan::Polygon& polygon) {return polygon.points.size(); });
-    std::cout << *std::min_element(sizeVec.begin(), sizeVec.end()) << std::endl;
-  }
-  else
-  {
-    throw INVALID_COMMAND;
-  }
-}
-
-void command::count(const std::vector<dyan::Polygon>& data)
-{
-  std::string arg;
-  std::cin >> arg;
-  int num = is_a_num(arg);
-  auto countFunc = [](int ac, const dyan::Polygon& polygon, int div, int mod)
-    {
-      int result = ac;
-      if (static_cast<int>(polygon.points.size()) % div == mod || mod == -1)
+    std::cout << std::accumulate(
+      data.begin() + 1,
+      data.end(),
+      data[0].points.size(),
+      [](std::size_t max, const dyan::Polygon& poly)
       {
-        result += 1;
+        return (poly.points.size() > max ? poly.points.size() : max);
       }
-      return result;
+    ) << '\n';
+  }
+  else
+  {
+    throw std::invalid_argument(INVALID_COMMAND);
+  }
+}
+
+void command::min(const std::vector<dyan::Polygon>& data, const std::string& arg)
+{
+  if (data.empty())
+    throw std::invalid_argument(INVALID_COMMAND);
+
+  if (arg == "AREA")
+  {
+    std::cout << std::min_element(data.begin(), data.end())->area() << '\n';
+  }
+  else if (arg == "VERTEXES")
+  {
+    std::vector<std::size_t> sizes(data.size());
+
+    std::cout << std::accumulate(
+      data.begin() + 1,
+      data.end(),
+      data[0].points.size(),
+      [](std::size_t min, const dyan::Polygon& polygon)
+      {
+        return (polygon.points.size() < min ? polygon.points.size() : min);
+      }
+    ) << '\n';
+  }
+  else
+  {
+    throw std::invalid_argument(INVALID_COMMAND);
+  }
+}
+
+void command::count(const std::vector<dyan::Polygon>& data, const std::string& arg)
+{
+  auto countPolygons = [](const dyan::Polygon& polygon, std::size_t mod2, std::size_t vertices)
+    {
+      return ((polygon.points.size() % 2 == mod2) || (mod2 == 2 && polygon.points.size() == vertices));
     };
+
+  int num = is_a_num(arg);
+
   if (num == -1)
   {
     if (arg == "EVEN")
     {
-      std::cout << std::accumulate(data.begin(), data.end(), 0,
-        std::bind(countFunc, _1, _2, 2, 0)) << std::endl;
+      std::cout << std::count_if(data.begin(), data.end(),
+        std::bind(countPolygons, _1, 0, 0)) << '\n';
     }
     else if (arg == "ODD")
     {
-      std::cout << std::accumulate(data.begin(), data.end(), 0,
-        std::bind(countFunc, _1, _2, 2, 1)) << std::endl;
+      std::cout << std::count_if(data.begin(), data.end(),
+        std::bind(countPolygons, _1, 1, 0)) << '\n';
     }
     else
     {
-      throw INVALID_COMMAND;
+      throw std::invalid_argument(INVALID_COMMAND);
     }
   }
   else if (num > 2)
   {
-    std::cout << std::accumulate(data.begin(), data.end(), 0,
-      std::bind(countFunc, _1, _2, num, 0)) << std::endl;
+    std::cout << std::count_if(data.begin(), data.end(),
+      std::bind(countPolygons, _1, 2, stoi(arg))) << '\n';
   }
   else
   {
-    throw INVALID_COMMAND;
+    throw std::invalid_argument(INVALID_COMMAND);
   }
 }
 
@@ -186,21 +177,18 @@ void command::rmecho(std::vector<dyan::Polygon>& data)
   std::cout << count << std::endl;
 }
 
-void command::same(std::vector<dyan::Polygon>& data)
+void command::same(const std::vector<dyan::Polygon>& data, dyan::Polygon& target)
 {
-  dyan::Polygon target;
-  std::cin >> target;
-
   if (!std::cin)
   {
-    throw INVALID_COMMAND;
+    throw std::invalid_argument(INVALID_COMMAND);
   }
   else
   {
     std::sort(target.points.begin(), target.points.end());
     auto countFunc = [&target](const dyan::Polygon& polygon)
       {
-        return polygon.is_overlay_compatible(target);
+        return polygon.isOverlayCompatible(target);
       };
     std::cout << std::count_if(data.begin(), data.end(), countFunc) << std::endl;
   }
