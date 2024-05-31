@@ -179,7 +179,7 @@ void command::rmecho(std::vector<dyan::Polygon>& data)
 
 void command::same(const std::vector<dyan::Polygon>& data, dyan::Polygon& target)
 {
-  if (!std::cin)
+  if (std::cin.fail() || std::cin.get() != '\n')
   {
     throw std::invalid_argument(INVALID_COMMAND);
   }
