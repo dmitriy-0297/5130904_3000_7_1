@@ -40,7 +40,7 @@ void area(std::vector<Shape>& shapes) {
       }) << std::endl;
   } else if (mode == "MEAN") {
     if (shapes.empty()) {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      throw std::invalid_argument("");
     }
     std::cout << (std::accumulate(shapes.begin(), shapes.end(), 0.0,
       [](double area, const Shape& shape) {
@@ -50,7 +50,7 @@ void area(std::vector<Shape>& shapes) {
   } else {
     size_t size = std::stoull(mode);
     if (size <= 2) {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      throw std::invalid_argument("");
     }
     std::cout << std::accumulate(shapes.begin(), shapes.end(), 0.0,
       [size](double area, const Shape& shape) {
@@ -78,7 +78,7 @@ void max(std::vector<Shape>& shapes) {
         std::bind(&std::vector<Point>::size, std::bind(&Shape::points, _2))));
     std::cout << result->points.size() << std::endl;
   } else {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("");
   }
 }
 
@@ -100,7 +100,7 @@ void min(std::vector<Shape>& shapes) {
         std::bind(&std::vector<Point>::size, std::bind(&Shape::points, _2))));
     std::cout << result->points.size() << std::endl;
   } else {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("");
   }
 }
 
@@ -117,7 +117,7 @@ void count(std::vector<Shape>& shapes) {
   } else {
     size_t size = std::stoi(mode);
     if (size <= 2) {
-      throw std::invalid_argument("<INVALID COMMAND>");
+      throw std::invalid_argument("");
     }
     std::cout << std::count_if(shapes.begin(), shapes.end(),
       [size](const Shape& shape) { return shape.points.size() == size; }) << std::endl;
@@ -128,7 +128,7 @@ void perms(std::vector<Shape>& shapes) {
   Shape local;
   std::cin >> local;
   if (!std::cin) {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("");
   } else {
     std::cout << std::count_if(shapes.begin(), shapes.end(),
       [&local](const Shape& shape) {
@@ -158,7 +158,7 @@ bool isRightAngledTriangle(const Point& point1, const Point& point2, const Point
 bool hasRightAngle(const Shape& shape) {
   size_t size = shape.points.size();
   if (size <= 2) {
-    throw std::invalid_argument("<INVALID COMMAND>");
+    throw std::invalid_argument("");
   }
   bool result = false;
   for (size_t i = 0; i < size && !result; ++i) {
