@@ -10,7 +10,7 @@ int command::is_a_num(const std::string& str)
   {
     return std::stoi(str);
   }
-  catch (std::invalid_argument const& ex)
+  catch (std::invalid_argument const& er)
   {
     return -1;
   }

@@ -51,25 +51,19 @@ double dyan::Polygon::area(void) const
 
 bool dyan::Polygon::is_overlay_compatible(const Polygon& other) const
 {
-  if (points.size() != other.points.size())
-    return false;
-
+  if (points.size() != other.points.size()) return false;
   std::vector<dyan::Point> sorted_points(points);
   std::sort(sorted_points.begin(), sorted_points.end());
-
   double x_offset = other.points[0].x - sorted_points[0].x;
   double y_offset = other.points[0].y - sorted_points[0].y;
-
   auto sorted_point = sorted_points.begin();
   auto testFunc = [&sorted_point, &x_offset, &y_offset](const Point& point)
     {
-      const double epsilon = 1e-6;
-      bool result = std::abs(point.x - (*sorted_point).x - x_offset) < epsilon
-        && std::abs(point.y - (*sorted_point).y - y_offset) < epsilon;
+      bool result = point.x - (*sorted_point).x == x_offset
+        && point.y - (*sorted_point).y == y_offset;
       sorted_point++;
       return result;
     };
-
   return std::all_of(other.points.begin(), other.points.end(), testFunc);
 }
 
