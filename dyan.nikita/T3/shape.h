@@ -7,8 +7,7 @@ namespace dyan
 {
   struct Point
   {
-    int x = 0;
-    int y = 0;
+    int x, y;
     bool operator==(const Point& other) const;
     bool operator!=(const Point& other) const;
     bool operator<(const Point& other) const;

@@ -11,77 +11,75 @@ int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    std::cerr << INCORRECT_USAGE << std::endl;
+    std::cerr << INCORRECT_USAGE;
     return EXIT_FAILURE;
   }
-  std::string filename = argv[1];
+
+  const std::string filename = argv[1];
   std::ifstream file(filename);
   if (!file)
   {
-    std::cerr << FILE_NOT_FOUND << std::endl;
+    std::cerr << FILE_NOT_FOUND;
     return EXIT_FAILURE;
   }
+
   std::cout << std::setprecision(1) << std::fixed;
-  std::vector<dyan::Polygon> data;
-  using input_it_t = std::istream_iterator<dyan::Polygon>;
+
+  std::vector<dyan::Polygon> fileData;
+
   while (!file.eof())
   {
-    std::copy(input_it_t{ file }, input_it_t{}, std::back_inserter(data));
-    if (!file.eof() && file.fail())
+    std::copy(std::istream_iterator<dyan::Polygon>(file),
+      std::istream_iterator<dyan::Polygon>(),
+      std::back_inserter(fileData));
+
+    if (file.fail() && !file.eof())
     {
       file.clear();
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  try
+
+  while (!std::cin.eof())
   {
-    while (!std::cin.eof())
+    std::string cmd;
+    std::cin >> cmd;
+    try
     {
-      std::string cmd;
-      std::cin >> cmd;
-      try
+      if (cmd == "AREA")
       {
-        if (cmd == "AREA")
-        {
-          command::area(data);
-        }
-        else if (cmd == "MAX")
-        {
-          command::max(data);
-        }
-        else if (cmd == "MIN")
-        {
-          command::min(data);
-        }
-        else if (cmd == "COUNT")
-        {
-          command::count(data);
-        }
-        else if (cmd == "RMECHO")
-        {
-          command::rmecho(data);
-        }
-        else if (cmd == "SAME")
-        {
-          command::same(data);
-        }
-        else if (cmd != "")
-        {
-          throw INVALID_COMMAND;
-        }
+        command::area(fileData);
       }
-      catch (const char* err)
+      else if (cmd == "MAX")
       {
-        std::cout << err << std::endl;
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        command::max(fileData);
+      }
+      else if (cmd == "MIN")
+      {
+        command::min(fileData);
+      }
+      else if (cmd == "COUNT")
+      {
+        command::count(fileData);
+      }
+      else if (cmd == "RMECHO")
+      {
+        command::rmecho(fileData);
+      }
+      else if (cmd == "SAME")
+      {
+        command::same(fileData);
+      }
+      else if (cmd != "")
+      {
+        throw INVALID_COMMAND;
       }
     }
-    return EXIT_SUCCESS;
+    catch (const char* error)
+    {
+      std::cout << error << std::endl;
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
   }
-  catch (...)
-  {
-    std::cerr << UNEXPECTED_ERROR << std::endl;
-    return EXIT_FAILURE;
-  }
+  return EXIT_SUCCESS;
 }

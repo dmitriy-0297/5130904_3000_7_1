@@ -21,11 +21,11 @@ bool dyan::Point::operator<(const Point& other) const
 bool dyan::Polygon::operator==(const Polygon& other) const
 {
   if (points.size() != other.points.size()) return false;
-  auto other_pnt = other.points.begin();
-  auto testFunc = [&other_pnt](const Point& pnt)
+  auto other_point = other.points.begin();
+  auto testFunc = [&other_point](const Point& point)
     {
-      bool result = pnt == *other_pnt;
-      other_pnt++;
+      bool result = point == *other_point;
+      other_point++;
       return result;
     };
   return std::all_of(points.begin(), points.end(), testFunc);
@@ -51,110 +51,109 @@ double dyan::Polygon::area(void) const
 
 bool dyan::Polygon::is_overlay_compatible(const Polygon& other) const
 {
-  if (points.size() != other.points.size()) return false;
+  if (points.size() != other.points.size())
+    return false;
+
   std::vector<dyan::Point> sorted_points(points);
   std::sort(sorted_points.begin(), sorted_points.end());
+
   double x_offset = other.points[0].x - sorted_points[0].x;
   double y_offset = other.points[0].y - sorted_points[0].y;
-  auto sorted_pnt = sorted_points.begin();
-  auto testFunc = [&sorted_pnt, &x_offset, &y_offset](const Point& pnt)
+
+  auto sorted_point = sorted_points.begin();
+  auto testFunc = [&sorted_point, &x_offset, &y_offset](const Point& point)
     {
-      bool result = pnt.x - (*sorted_pnt).x == x_offset
-        && pnt.y - (*sorted_pnt).y == y_offset;
-      sorted_pnt++;
+      const double epsilon = 1e-6;
+      bool result = std::abs(point.x - (*sorted_point).x - x_offset) < epsilon
+        && std::abs(point.y - (*sorted_point).y - y_offset) < epsilon;
+      sorted_point++;
       return result;
     };
+
   return std::all_of(other.points.begin(), other.points.end(), testFunc);
 }
 
-
-std::istream& dyan::operator>>(std::istream& in, Point& pnt)
+std::istream& dyan::operator>>(std::istream& in, dyan::Delimeter&& dest)
 {
-  if (in.peek() == '\n')
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  char symbol = '0';
+
+  in >> symbol;
+
+  if (in && (symbol != dest.exp))
   {
     in.setstate(std::ios::failbit);
-    return in;
   }
-
-  std::istream::sentry guard(in);
-  if (!guard)
-  {
-    return in;
-  }
-  in >> Delimeter('(') >> pnt.x >> Delimeter(';') >> pnt.y >> Delimeter(')');
   return in;
 }
 
-std::ostream& dyan::operator<<(std::ostream& out, const Point& pnt)
+std::istream& dyan::operator>>(std::istream& in, dyan::Point& point)
 {
-  std::ostream::sentry guard(out);
-  if (!guard)
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
+  in >> dyan::Delimeter{ '(' } >> point.x >> dyan::Delimeter{ ';' } >> point.y >> dyan::Delimeter{ ')' };
+  return in;
+}
+
+std::istream& dyan::operator>>(std::istream& in, dyan::Polygon& polygon)
+{
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+  size_t numPoints;
+
+  in >> numPoints;
+
+  if (numPoints < 3)
+  {
+    in.setstate(std::istream::failbit);
+    return in;
+  }
+
+  polygon.points.clear();
+  polygon.points.resize(numPoints);
+
+  for (dyan::Point& point : polygon.points)
+  {
+    in >> point;
+  }
+  return in;
+}
+
+std::ostream& dyan::operator<<(std::ostream& out, const dyan::Point& point)
+{
+  std::ostream::sentry sentry(out);
+  if (!sentry)
   {
     return out;
   }
-  out << "(" << pnt.x << "; " << pnt.y << ")";
+  out << "(" << point.x << ";" << point.y << ")";
   return out;
 }
 
-std::istream& dyan::operator>>(std::istream& in, Polygon& poly)
+std::ostream& dyan::operator<<(std::ostream& out, const dyan::Polygon& polygon)
 {
-  std::istream::sentry guard(in);
-  if (!guard)
-  {
-    return in;
-  }
-  size_t size;
-  in >> size;
-  if (size < 3)
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-  poly.points.clear();
-  poly.points.resize(size);
-
-  for (size_t i = 0; i < size; i++)
-  {
-    in >> poly.points[i];
-  }
-
-  if (in.peek() != int('\n') && !in.eof())
-  {
-    in.setstate(std::ios::failbit);
-    return in;
-  }
-
-  return in;
-}
-
-std::ostream& dyan::operator<<(std::ostream& out, const Polygon& poly)
-{
-  std::ostream::sentry guard(out);
-  if (!guard)
+  std::ostream::sentry sentry(out);
+  if (!sentry)
   {
     return out;
   }
-  out << poly.points.size() << " ";
-  for (const auto& p : poly.points)
+
+  out << polygon.points.size() << " ";
+
+  for (const dyan::Point& point : polygon.points)
   {
-    out << p << " ";
+    out << point << " ";
   }
   return out;
-}
-
-std::istream& dyan::operator>>(std::istream& in, Delimeter&& del)
-{
-  std::istream::sentry guard(in);
-  if (!guard)
-  {
-    return in;
-  }
-  char c;
-  in >> c;
-
-  if (!in || c != del.exp)
-  {
-    in.setstate(std::ios::failbit);
-  }
-  return in;
 }
